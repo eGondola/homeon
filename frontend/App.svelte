@@ -1,45 +1,21 @@
 <script type="ts">
-    import Calendar from "./components/Calendar.svelte";
     import { Router, Link, Route } from "svelte-routing";
 
     import Authorization from "./components/Authorization.svelte";
     import List from "./components/list.svelte";
-    import { addDays } from "./util/date";
-
-    let plans = [
-        {
-            start: new Date("2021-12-15 12:54"),
-            end: new Date("2021-12-15 23:59"),
-            text: "nic nie robienie",
-        },
-        {
-            start: new Date("2021-12-11 5:00"),
-            end: new Date("2021-12-14 10:00"),
-            text: "Też nic nie robienie",
-        },
-        {
-            start: new Date("2021-12-16 4:00"),
-            end: new Date("2021-12-16 13:00"),
-            text: "bruh",
-        },
-        {
-            start: new Date("2021-12-18 13:00"),
-            end: new Date("2021-12-20 23:00"),
-            text: "was",
-        },
-    ];
-    let date = new Date("2021-12-12");
+    import CalendarPage from "./pages/CalendarPage.svelte";
+    import * as api from "./util/api";
 </script>
 
-{#await fetch("/checkLogin").then((response) => response.json()) then user}
+{#await api.get("checkLogin") then user}
     {#if !user.login}
         <Authorization />
     {:else}
         {user.login}
         <button
-            on:click={() => {
-                fetch("/logout");
-                window.location.reload();
+            on:click={async () => {
+                await fetch("/logout");
+                location.reload();
             }}>Wyloguj</button
         >
         <Router>
@@ -55,17 +31,9 @@
                 </ul>
             </nav>
             <Route path="/">
-                <Calendar {plans} {date} />
-                <button
-                    on:click={() => {
-                        date = addDays(date, -7);
-                    }}>←</button
-                >
-                <button
-                    on:click={() => {
-                        date = addDays(date, 7);
-                    }}>→</button
-                >
+                {#await api.get("groups") then groups}
+                    <CalendarPage {groups} />
+                {/await}
             </Route>
             <nav>
                 <Route path="/test">

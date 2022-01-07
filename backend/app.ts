@@ -21,9 +21,48 @@ Main();
 async function Main() {
     await connectToDatabase();
 
+    app.post("/api/add-group", (req, res) => {
+        const token = nanoid();
+        collections.groups?.insertOne({
+            name: req.body.name,
+            token,
+            plans: [],
+        });
+        collections.users?.updateOne(
+            { login: req.session?.user.login },
+            { $push: { groups: token } }
+        );
+    });
+
+    app.get("/api/groups", async (req, res) => {
+        const user = await collections.users?.findOne({
+            login: req.session?.user.login,
+        });
+        const groups = await collections.groups
+            ?.find({ token: { $in: user?.groups } })
+            .toArray();
+        res.send(groups);
+    });
+
+    app.post("/api/add-plan", (req, res) => {
+        collections.groups?.updateOne(
+            { token: req.body.token },
+            { $push: { plans: req.body.plan } }
+        );
+    });
+
+    app.get("/group/:token", (req, res) => {
+        collections.users?.updateOne(
+            { login: req.session?.user.login },
+            { $push: { groups: req.params.token } }
+        );
+        res.sendFile(path.resolve("frontend/public/index.html"));
+    });
+
     app.get("*", (req, res) => {
         res.sendFile(path.resolve("frontend/public/index.html"));
     });
+
     app.post("/test", async (req, res) => {
         let list = await collections?.list?.find({}).toArray();
         res.send(list);
@@ -46,14 +85,11 @@ async function Main() {
         let obj = { id: last + 1, text: d.text, count: d.count };
         collections.list?.insertOne(obj);
     });
-    app.get("/", (req, res) => {
-        res.sendFile(path.resolve("frontend/public/index.html"));
-    });
 
     app.listen(process.env.PORT || 3000);
 }
 
-app.get("/checkLogin", (req: any, res) => {
+app.get("/api/checkLogin", (req: any, res) => {
     res.send(req.session.user ? req.session.user : {});
 });
 
@@ -72,7 +108,6 @@ app.get("/logout", async (req: any, res) => {
 });
 
 async function register(req: any) {
-    //const [email]: any = await Find("Users", { email: req.body.email })
     const [email]: any = await collections.users?.find({
         email: req.body.email,
     });
@@ -81,16 +116,25 @@ async function register(req: any) {
     const [login]: any = await collections.users?.find({
         login: req.body.login,
     });
-    //const [login]: any = await Find("Users", { login: req.body.login })
     if (login) return "Podany login jest już zajęty";
 
-    await collections.users?.insertOne({
-        login: req.body.login,
-        password: await bcrypt.hash(req.body.password, 10),
-        email: req.body.email,
-        registered: 0,
-        hash: nanoid(),
-    });
+    const token = nanoid();
+
+    await Promise.all([
+        collections.users?.insertOne({
+            login: req.body.login,
+            password: await bcrypt.hash(req.body.password, 10),
+            email: req.body.email,
+            registered: 0,
+            hash: nanoid(),
+            groups: [token],
+        }),
+        collections.groups?.insertOne({
+            name: "Osobiste",
+            token,
+            plans: [],
+        }),
+    ]);
 
     return "Konto zostało utworzone! Dokończ rejestrację klikając w link wysłany na podany adres email";
 }
