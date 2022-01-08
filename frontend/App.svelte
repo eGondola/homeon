@@ -27,6 +27,11 @@
             end: new Date("2021-12-20 23:00"),
             text: "was",
         },
+        {
+            start: new Date("2022-01-08 13:00"),
+            end: new Date("2022-01-08 20:30"),
+            text: "Volper ty kurwooooo"
+        }
     ];
     let date = new Date("2021-12-12");
 </script>
