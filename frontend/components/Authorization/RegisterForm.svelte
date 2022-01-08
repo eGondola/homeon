@@ -37,6 +37,6 @@
         <label for="email">Email</label>
     </span>
 
-    <p>{info}</p><br>
+    <p>{info}</p>
     <button type="submit">Zarejestruj</button>
 </form>
