@@ -102,41 +102,66 @@ app.post("/login", async (req: any, res) => {
     res.send(await login(req));
 });
 
+app.post("/confirm", async (req: any, res) => {
+    res.send(await confirm(req));
+});
+
 app.get("/logout", async (req: any, res) => {
     req.session.user = {};
     res.send();
 });
 
 async function register(req: any) {
-    const [email]: any = await collections.users?.find({
-        email: req.body.email,
-    });
+    const [email]: any = await collections.users
+        ?.find({ email: req.body.email })
+        .toArray();
     if (email) return "Podany adres email został już zarejestrowany";
 
-    const [login]: any = await collections.users?.find({
-        login: req.body.login,
-    });
+    const [login]: any = await collections.users
+        ?.find({ login: req.body.login })
+        .toArray();
     if (login) return "Podany login jest już zajęty";
 
-    const token = nanoid();
-
+    const personalGroupToken = nanoid();
+    const confirmEmailToken = "r" + nanoid();
     await Promise.all([
         collections.users?.insertOne({
             login: req.body.login,
             password: await bcrypt.hash(req.body.password, 10),
             email: req.body.email,
-            registered: 0,
-            hash: nanoid(),
-            groups: [token],
+            confirmEmailToken,
+            groups: [personalGroupToken],
         }),
         collections.groups?.insertOne({
             name: "Osobiste",
-            token,
+            token: personalGroupToken,
             plans: [],
         }),
     ]);
 
+    console.log(confirmEmailToken);
     return "Konto zostało utworzone! Dokończ rejestrację klikając w link wysłany na podany adres email";
+}
+
+async function confirm(req: any) {
+    const confirmEmailToken = req.body.confirmEmailToken;
+    const user: any = await collections.users?.findOne({ confirmEmailToken });
+
+    if (user) {
+        await collections.users?.updateOne(
+            { confirmEmailToken },
+            { $unset: { confirmEmailToken: 1 } }
+        );
+
+        req.session.user = {
+            login: user.login,
+            email: user.email,
+        };
+
+        return true;
+    }
+
+    return false;
 }
 
 async function login(req: any) {
