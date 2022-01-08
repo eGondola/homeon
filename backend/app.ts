@@ -1,7 +1,6 @@
 import express from "express";
 import path from "path";
-import { getDatabase } from "./Database";
-import bodyParser from "body-parser";
+import { getDatabase } from "./database";
 import bcrypt from "bcryptjs";
 import { nanoid } from "nanoid";
 import cookieSession from "cookie-session";
@@ -11,7 +10,7 @@ main();
 async function main() {
     const app = express();
     app.use(express.static("frontend/public"));
-    app.use(bodyParser.text());
+    app.use(express.text());
     app.use(express.json());
     app.use(
         cookieSession({
@@ -21,26 +20,27 @@ async function main() {
     );
     const database = await getDatabase();
 
-    app.get("/api/checkLogin", (req: any, res) => {
-        res.send(req.session.user ? req.session.user : {});
+    app.get("/api/checkLogin", (req, res) => {
+        res.send(req.session?.user ?? {});
     });
 
     // authorization
-    app.post("/register", async (req: any, res) => {
+    app.post("/register", async (req, res) => {
         res.send(await register(req));
     });
 
-    app.post("/login", async (req: any, res) => {
+    app.post("/login", async (req, res) => {
         res.send(await login(req));
     });
 
-    app.post("/confirm", async (req: any, res) => {
+    app.post("/confirm", async (req, res) => {
         res.send(await confirm(req));
     });
 
-    app.get("/logout", async (req: any, res) => {
-        req.session.user = {};
-        res.send();
+    app.get("/logout", async (req, res) => {
+        if (req.session) {
+            req.session.user = {};
+        }
     });
 
     app.post("/api/add-group", (req, res) => {
@@ -89,14 +89,15 @@ async function main() {
         let list = await database.list.find({}).toArray();
         res.send(list);
     });
+
     app.post("/updateList", (req, res) => {
         //error
         database.list.drop();
         if (JSON.parse(req.body).length > 0)
             database.list.insertMany(JSON.parse(req.body));
     });
+
     app.post("/addToList", async (req, res) => {
-        //console.log(req.body);
         let last: any = await database.list
             .find({})
             .sort({ _id: -1 })
