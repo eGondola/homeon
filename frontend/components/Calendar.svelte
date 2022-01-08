@@ -1,9 +1,10 @@
 <script type="ts">
     import DateText from "./DateText.svelte";
     import { addDays } from "../util/date";
-
+    import { afterUpdate, onMount } from "svelte"
     export let plans: Plans;
-
+    let innerWidth: number
+    let len = 7
     type Plans = Plan[];
 
     type Plan = {
@@ -13,31 +14,85 @@
     };
 
     export let date: Date;
-
+    
     $: monday = getMonday(date);
     $: nextMonday = addDays(monday, 7);
     $: dayPlans = generateDayPlans(plans, monday, nextMonday);
-
+    $: {
+        if(innerWidth < 800)
+        {
+            let d = new Date()
+            daysOfWeek = []
+            daysOfWeek[0] = d.getDay() ? week[[d.getDay()-1]] : week[6];
+            len = 1;
+        }
+        else
+        {
+            daysOfWeek = week
+            len = 7
+        }
+        dayPlans = generateDayPlans(plans, monday, nextMonday)
+    }
     function generateDayPlans(plans: Plans, weekBegin: Date, weekEnd: Date) {
-        const dayPlans: DayPlan[][] = Array.from({ length: 7 }, () => []);
-        for (const { start, end, text } of plans.filter(isThisWeek)) {
-            let i = start <= monday ? 0 : start.getDay() - 1;
-            let current: Date;
-            do {
-                current = addDays(monday, i);
-                dayPlans[i].push({
-                    top: isSameDate(current, start)
-                        ? getFractionOfDayPassed(start)
-                        : 0,
-                    bottom: isSameDate(current, end)
-                        ? 1 - getFractionOfDayPassed(end)
-                        : 0,
-                    text,
-                });
-                ++i;
-            } while (!isSameDate(current, end) && i < 7);
+        let dayPlans: DayPlan[][] = Array.from({ length: len }, () => []);
+        if(len == 1)
+        {
+            let d = new Date()
+            let i = 0;
+            for (const { start, end, text } of plans.filter(isThisDay)) {
+                console.log({ start, end, text });
+                //let i = start <= monday ? 0 : start.getDay() - 1;
+                
+                let current: Date;
+                do {
+                    current = d;
+                    dayPlans[i].push({
+                        top: isSameDate(current, start)
+                            ? getFractionOfDayPassed(start)
+                            : 0,
+                        bottom: isSameDate(current, end)
+                            ? 1 - getFractionOfDayPassed(end)
+                            : 0,
+                        text,
+                    });
+                    ++i;
+                } while (!isSameDate(current, end) && i < len);
+            }
+        }
+        else
+        {
+            for (const { start, end, text } of plans.filter(isThisWeek)) {
+                let i = start <= monday ? 0 : start.getDay() - 1;
+                let current: Date;
+                do {
+                    current = addDays(monday, i);
+                    dayPlans[i].push({
+                        top: isSameDate(current, start)
+                            ? getFractionOfDayPassed(start)
+                            : 0,
+                        bottom: isSameDate(current, end)
+                            ? 1 - getFractionOfDayPassed(end)
+                            : 0,
+                        text,
+                    });
+                    ++i;
+                } while (!isSameDate(current, end) && i < len);
+            }
         }
         return dayPlans;
+
+        function isThisDay({start, end}: Plan)
+        {
+            let p = new Date();
+            p.setUTCHours(0, 0, 0, 0);
+            let k = new Date();
+            k.setUTCHours(23, 59, 59, 999);
+            return (
+                (start >= p && start <= k) ||
+                (end >= p && end <= k) ||
+                (start <= p && end >= k)
+            );
+        }
 
         function isThisWeek({ start, end }: Plan) {
             return (
@@ -84,7 +139,45 @@
         );
     }
 
-    const daysOfWeek = [
+    function GetRandomColor()
+    {
+        let random = Math.floor( Math.random() * 16777216 );
+        let hexValue = random.toString(16);
+        hexValue = "#" + hexValue;
+        return hexValue;
+    }
+    function SetRandomColors()
+    {
+        let last:string;
+        let color = GetRandomColor();
+        document.querySelectorAll<HTMLElement>(".plan").forEach(plan => {
+            if(plan.textContent != last)
+            {
+                last = plan?.textContent ? plan?.textContent : "";
+                color = GetRandomColor();
+            }
+            
+            plan.style.backgroundColor = color;
+        });
+    }
+
+    onMount(() => {
+        //SetRandomColors();
+    });
+    afterUpdate(() => {
+        //SetRandomColors();
+    })
+
+    let daysOfWeek = [
+        "Poniedziałek",
+        "Wtorek",
+        "Środa",
+        "Czwartek",
+        "Piątek",
+        "Sobota",
+        "Niedziela",
+    ];
+    let week = [
         "Poniedziałek",
         "Wtorek",
         "Środa",
@@ -94,11 +187,11 @@
         "Niedziela",
     ];
 </script>
-
+<svelte:window bind:innerWidth />
 <div class="calendar">
     <div class="calendar-header">
         <div class="date-texts">
-            <DateText date={monday} />
+            <DateText date={monday}/>
             <br />
             <DateText date={nextMonday} />
         </div>
