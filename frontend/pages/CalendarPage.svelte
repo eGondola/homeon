@@ -21,6 +21,7 @@
     let innerWidth: number;
 </script>
 
+<svelte:window bind:innerWidth />
 <Calendar {plans} {date} />
 <button
     on:click={() => {
