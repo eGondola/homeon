@@ -18,17 +18,24 @@
     let start = Date.now();
     let end = Date.now();
     let text = "";
+    let innerWidth: number;
 </script>
 
 <Calendar {plans} {date} />
 <button
     on:click={() => {
-        date = addDays(date, -7);
+        if(innerWidth < 800)
+            date = addDays(date, -1);
+        else
+            date = addDays(date, -7);
     }}>←</button
 >
 <button
     on:click={() => {
-        date = addDays(date, 7);
+        if(innerWidth < 800)
+            date = addDays(date, 1);
+        else
+            date = addDays(date, 7);
     }}>→</button
 >
 <form
