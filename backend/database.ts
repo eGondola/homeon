@@ -1,29 +1,43 @@
-import * as mongoDB from "mongodb";
+import { MongoClient } from "mongodb";
 import * as dotenv from "dotenv";
 
-let process = {
+const process = {
     env: {
         DB_CONN_STRING: "mongodb://localhost:27017",
-        DB_NAME: "HomeOn",
-        COLLECTION_NAME_list: "List", 
-        COLLECTION_NAME_users: "users"
-    }
+        DB_NAME: "HomeON",
+    },
+};
+
+export async function getDatabase() {
+    dotenv.config();
+    const client = new MongoClient(process.env.DB_CONN_STRING);
+    await client.connect();
+    const database = client.db(process.env.DB_NAME);
+    return {
+        list: database.collection<ListElement>("list"),
+        users: database.collection<User>("users"),
+        groups: database.collection<Group>("groups"),
+    };
 }
-export const collections: { list?: mongoDB.Collection, users?: mongoDB.Collection } = {}
-export let List = {};
-export async function connectToDatabase() {
-    try 
-    {
-        dotenv.config();
-        const client: mongoDB.MongoClient = new mongoDB.MongoClient(process.env.DB_CONN_STRING);
-        await client.connect();
-        const db: mongoDB.Db = client.db(process.env.DB_NAME);
-        const Collection_list: mongoDB.Collection = db.collection(process.env.COLLECTION_NAME_list);
-        collections.list = Collection_list;
-        const Collection_users: mongoDB.Collection = db.collection(process.env.COLLECTION_NAME_users);
-        collections.users = Collection_users;
-        //Pobranie listy z kolekcji
-        List = await collections?.list?.find({}).toArray();
-    }
-    catch(err){console.log(err)}
-}
+
+type ListElement = any; // Szyplo to twoja lista więc uzupełnij
+
+type User = {
+    login: string;
+    password: string;
+    email: string;
+    confirmEmailToken?: string;
+    groups: string[];
+};
+
+type Group = {
+    name: string;
+    token: string;
+    plans: Plan[];
+};
+
+type Plan = {
+    start: string;
+    end: string;
+    text: string;
+};

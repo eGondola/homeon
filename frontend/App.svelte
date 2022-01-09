@@ -1,3 +1,90 @@
+<script type="ts">
+    import { Router, link, Route } from "svelte-routing";
+
+    import Authorization from "./components/Authorization.svelte";
+    import List from "./components/list.svelte";
+    import CalendarPage from "./pages/CalendarPage.svelte";
+    import * as api from "./util/api";
+</script>
+
+{#await api.get("checkLogin") then user}
+    {#if !user.login}
+        <Authorization />
+    {:else}
+        <Router>
+            <div class="home">
+                <div class="user-profile">
+                    <div>
+                        <div>
+                            {user.login}
+                            <button
+                                on:click={async () => {
+                                    await fetch("/logout");
+                                    location.reload();
+                                }}>Wyloguj</button
+                            >
+                        </div>
+                    </div>
+                    <div>
+                        <a href="/" use:link><div class="home" /></a>
+                    </div>
+                </div>
+                <Route path="/">
+                    <div class="info-block">
+                        <div>
+                            <div />
+                            <div />
+                        </div>
+                    </div>
+
+                    <div class="navigation">
+                        <div>
+                            <div>
+                                <div>
+                                    <a href="/home-manage" use:link>
+                                        <div class="home-manage" />
+                                    </a>
+                                    <a href="/plans" use:link>
+                                        <div class="plans" />
+                                    </a>
+                                </div>
+                            </div>
+                            <div>
+                                <div>
+                                    <a href="/shopping-list" use:link>
+                                        <div class="shopping-list" />
+                                    </a>
+                                </div>
+                            </div>
+                            <div>
+                                <div>
+                                    <a href="/household-duties" use:link>
+                                        <div class="household-duties" />
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </Route>
+
+                <Route path="/plans">
+                    {#await api.get("groups") then groups}
+                        <CalendarPage {groups} />
+                    {/await}
+                </Route>
+
+                <Route path="/test">
+                    <List />
+                </Route>
+
+                <Route>
+                    <p style="text-align: center">404 Not Found</p>
+                </Route>
+            </div>
+        </Router>
+    {/if}
+{/await}
+
 <style lang="scss">
     @import "./styles/variables.scss";
 
@@ -5,12 +92,12 @@
         box-sizing: border-box;
     }
 
-    #home {
+    .home {
         height: 100%;
         display: flex;
         flex-flow: column;
 
-        #user_profile {
+        .user-profile {
             display: flex;
             flex-flow: row;
             padding: 4vmin;
@@ -22,7 +109,7 @@
 
                 &:nth-child(1) {
                     display: flex;
-                    
+
                     > div {
                         display: flex;
                         flex-flow: column;
@@ -35,12 +122,13 @@
                         button {
                             border: none;
                             border-radius: 2vmin;
-                            
+
                             padding: 3vmin 7.5vmin;
                             margin: 1.5vmin;
 
-                            box-shadow: -0.5vmin -0.5vmin 1vmin 0vmin #00000040, 0.5vmin 0.5vmin 1vmin 0vmin #00000040;
-                            
+                            box-shadow: -0.5vmin -0.5vmin 1vmin 0vmin #00000040,
+                                0.5vmin 0.5vmin 1vmin 0vmin #00000040;
+
                             background-color: $s-color-dark;
                             color: white;
                             font-size: 3vmin;
@@ -54,18 +142,18 @@
                     display: flex;
                     justify-content: right;
 
-                    #home {
+                    .home {
                         width: 10vmin;
                         background-repeat: no-repeat;
                         background-position: center;
-                        background-image: url('icons/home.png');
+                        background-image: url("icons/home.png");
                         background-size: 90%;
                     }
                 }
             }
         }
 
-        #info_block {
+        .info-block {
             flex: 1;
             display: flex;
             align-items: center;
@@ -87,7 +175,7 @@
             }
         }
 
-        #navigation {
+        .navigation {
             flex: 2.5;
             display: flex;
             align-items: center;
@@ -99,7 +187,7 @@
 
                 > div {
                     flex: 1;
-                    
+
                     display: flex;
                     flex-flow: row;
                     align-items: center;
@@ -115,7 +203,7 @@
                         display: flex;
                         flex-flow: row;
                         justify-content: center;
-                        
+
                         > a {
                             display: contents;
 
@@ -129,31 +217,31 @@
                             }
                         }
 
-                        #home_menage {
+                        .home-manage {
                             margin-left: 2.5vmin;
                             margin-right: 4vmin;
-                            background-image: url('icons/home_menage.png');
+                            background-image: url("icons/home-manage.png");
                             background-size: 40%;
                         }
 
-                        #plans {
+                        .plans {
                             margin-left: 4vmin;
                             margin-right: 2.5vmin;
-                            background-image: url('icons/plans.png');
+                            background-image: url("icons/plans.png");
                             background-size: 40%;
                         }
 
-                        #shopping_list {
+                        .shopping-list {
                             margin-left: 2.5vmin;
                             margin-right: 2.5vmin;
-                            background-image: url('icons/shopping_list.png');
+                            background-image: url("icons/shopping-list.png");
                             background-size: 18%;
                         }
 
-                        #household_duties {
+                        .household-duties {
                             margin-left: 2.5vmin;
                             margin-right: 2.5vmin;
-                            background-image: url('icons/clean.png');
+                            background-image: url("icons/clean.png");
                             background-size: 18%;
                         }
                     }
@@ -162,130 +250,3 @@
         }
     }
 </style>
-<script type="ts">
-    import Calendar from "./components/Calendar.svelte";
-    import { Router, Link, Route } from "svelte-routing";
-
-    import Authorization from "./components/Authorization.svelte";
-    import List from "./components/list.svelte";
-    import { addDays } from "./util/date";
-
-    let plans = [
-        {
-            start: new Date("2021-12-15 12:54"),
-            end: new Date("2021-12-15 23:59"),
-            text: "nic nie robienie",
-        },
-        {
-            start: new Date("2021-12-11 5:00"),
-            end: new Date("2021-12-14 10:00"),
-            text: "Też nic nie robienie",
-        },
-        {
-            start: new Date("2021-12-16 4:00"),
-            end: new Date("2021-12-16 13:00"),
-            text: "bruh",
-        },
-        {
-            start: new Date("2021-12-18 13:00"),
-            end: new Date("2021-12-20 23:00"),
-            text: "was",
-        },
-        {
-            start: new Date("2022-01-08 13:00"),
-            end: new Date("2022-01-09 23:00"),
-            text: "Cezary rosiński to spoko gość",
-        },
-        {
-            start: new Date("2022-01-10 23:00"),
-            end: new Date("2022-01-13 13:00"),
-            text: "igor swiens to dobry kolega",
-        },
-    ];
-    let date = new Date();
-    let innerWidth: number;
-</script>
-<svelte:window bind:innerWidth />
-{#await fetch("/checkLogin").then((response) => response.json()) then user}
-    {#if !user.login}
-        <Authorization />
-    {:else}
-        <Router>
-            <div id="home">
-                <div id="user_profile">
-                    <div>
-                        <div>
-                            {user.login}
-                            <button
-                                on:click={() => {
-                                    fetch("/logout");
-                                    window.location.reload();
-                                }}>Wyloguj</button
-                            >
-                        </div>
-                    </div>
-                    <div>
-                        <a href="/"><div id="home"></div></a>
-                    </div>
-                </div>
-                <Route path="/">
-                    <div id="info_block">
-                        <div>
-                            <div></div>
-                            <div></div>
-                        </div>
-                    </div>
-                
-                    <div id="navigation">
-                        <div>
-                            <div>
-                                <div>
-                                    <a href="/home_menage"><div id="home_menage"></div></a>
-                                    <a href="/plans"><div id="plans"></div></a>
-                                </div>
-                            </div>
-                            <div>
-                                <div>
-                                    <a href="/shopping_list"><div id="shopping_list"></div></a>
-                                </div>
-                            </div>
-                            <div>
-                                <div>
-                                    <a href="/household_duties"><div id="household_duties"></div></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </Route>
-
-                <Route path="/plans">
-                    <Calendar {plans} {date} />
-                    <button
-                        on:click={() => {
-                            if(innerWidth < 800)
-                                date = addDays(date, -1);
-                            else
-                                date = addDays(date, -7);
-                        }}>←</button
-                    >
-                    <button
-                        on:click={() => {
-                            if(innerWidth < 800)
-                                date = addDays(date, 1);
-                            else
-                                date = addDays(date, 7);
-                        }}>→</button
-                    >
-                </Route>
-
-                <Route path="/test">
-                    <List />
-                </Route>
-
-                <Route>
-                    <p style="text-align: center">404 Not Found</p>
-                </Route>
-            </div>
-        </Router>
-    {/if}
-{/await}
