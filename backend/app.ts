@@ -1,6 +1,6 @@
 import express from "express";
 import path from "path";
-import { connectToDatabase, List, collections } from './Database';
+import { connectToDatabase, List, collections } from './database';
 import bodyParser from "body-parser";
 import bcrypt from "bcryptjs";
 import { nanoid } from "nanoid";
