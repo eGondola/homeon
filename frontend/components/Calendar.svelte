@@ -235,67 +235,77 @@
     </div>
 </div>
 
-<style>
-    .hour {
-        margin: 5px;
-        padding: 3px;
-    }
+<style lang="scss">
+    @import "../styles/variables.scss";
 
     .calendar {
-        width: 100%;
-    }
+        font-size: 5vmin;
+        @media (min-width: 800px) {font-size: 3vmin;}
+        
+        font-variant: small-caps;
+        
+        .calendar-header {
+            display: flex;
+            flex-flow: row;
 
-    .calendar__body {
-        display: grid;
-        grid-template-columns: 100px;
-    }
+            .date-texts {
+                width: 15vmin;
+                @media (min-width: 800px) {width: 10vmin;}
+                text-align: center;
+            }
 
-    .hours {
-        grid-column-start: 1;
-        grid-column-end: 1;
-    }
+            .days-header {
+                flex: 1;
+                display: flex;
+                flex-flow: row;
+                justify-content: center;
+                text-align: center;
 
-    .calendar-header {
-        display: grid;
-        grid-template-columns: 100px;
-    }
+                @media (min-width: 800px) {
+                    > div {
+                        flex: 1;
+                    }
+                }
+            }
+        }
 
-    .day {
-        border: 1px solid black;
-        height: 100%;
-        width: 100%;
-        text-align: center;
-        margin-left: 2px;
-        margin-right: 2px;
-        padding: 10px;
-        position: relative;
-    }
+        .calendar__body {
+            display: flex;
+            flex-flow: row;
 
-    .plan {
-        background-color: aqua;
-        position: absolute;
-    }
+            .hours {
+                width: 15vmin;
+                @media (min-width: 800px) {width: 10vmin;}
 
-    .week {
-        grid-column-start: 2;
-        grid-column-end: 2;
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-    }
+                .hour {
+                    margin: 1vmin;
+                    text-align: center;
+                    font-size: 3.5vmin;
+                    @media (min-width: 800px) {font-size: 2.5vmin;}
+                }
+            }
 
-    .day-header {
-        width: 100%;
-        padding: 10px;
-        margin: 2px;
-        border: 1px solid black;
-    }
-    .days-header {
-        grid-column-start: 2;
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-    }
+            .week {
+                flex: 1;
+                
+                display: flex;
+                flex-flow: row;
 
-    .date-texts {
-        min-width: 100px;
+                .day {
+                    flex: 1;
+                    border-left: 0.2vmin solid $s-color-light;
+                    text-align: center;
+                    margin-left: 0.2vmin;
+                    margin-right: 0.2vmin;
+                    padding: 2.5vmin;
+                    position: relative;
+
+                    .plan {
+                        background-color: aqua;
+                        position: absolute;
+                    }
+                }
+            }
+        }
     }
 </style>

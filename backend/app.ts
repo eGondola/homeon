@@ -41,6 +41,7 @@ async function main() {
         if (req.session) {
             req.session.user = {};
         }
+        res.send();
     });
 
     app.post("/api/add-group", (req, res) => {
