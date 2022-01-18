@@ -60,7 +60,7 @@
         text,
     }));
 
-    let date = new Date("2021-12-12");
+    let date = new Date();
     let groupName = "";
     let start = Date.now();
     let end = Date.now();
@@ -71,7 +71,9 @@
 <svelte:window bind:innerWidth />
 <div id="arrows">
     <div>
-        <button><i class="icon-left-open"></i></button>
+        <button on:click={() => {
+            date = addDays(date, -7);
+        }}><i class="icon-left-open"></i></button>
         <button
             on:click={() => {
                 if(innerWidth < 800)
@@ -90,7 +92,9 @@
                     date = addDays(date, 7);
             }}><i class="icon-right-dir"></i></button
         >
-        <button><i class="icon-right-open"></i></button>
+        <button on:click={() => {
+            date = addDays(date, 7);
+        }}><i class="icon-right-open"></i></button>
     </div>
 </div>
 <Calendar {plans} {date} />
