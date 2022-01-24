@@ -4,6 +4,7 @@
     import * as api from "../util/api";
 
     export let groups: any;
+    export let showGroups: any;
     let name: string;
 
     const currentGroup = writable(groups[0]);
@@ -32,7 +33,7 @@
         groupSwitch = !groupSwitch;
     }
 </script>
-
+{#if showGroups}
 <div id="top">
     <div id="groups">
         <div>
@@ -68,6 +69,7 @@
         {/if}
     </div>
 </div>
+{/if}
 <slot />
 
 <style lang="scss">
