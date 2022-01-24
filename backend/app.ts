@@ -59,6 +59,7 @@ async function main() {
             { login: req.session?.user.login },
             { $push: { groups: token } }
         );
+        res.send(token);
     });
 
     app.get("/api/groups", async (req, res) => {
