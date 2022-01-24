@@ -60,6 +60,7 @@ async function main() {
             { login: req.session?.user.login },
             { $push: { groups: token } }
         );
+        res.send(token);
     });
 
     app.get("/api/groups", async (req, res) => {
@@ -128,7 +129,7 @@ async function main() {
         if (login) return "Podany login jest już zajęty";
 
         const personalGroupToken = nanoid();
-        const confirmEmailToken = "r" + nanoid();
+        const confirmEmailToken = nanoid();
 
         await Promise.all([
             database.users.insertOne({
