@@ -5,7 +5,7 @@ import sveltePreprocess from "svelte-preprocess";
 import typescript from "@rollup/plugin-typescript";
 
 export default {
-    input: "frontend/index.js",
+    input: "frontend/index.ts",
     output: {
         file: "frontend/public/bundle.js",
         format: "iife",
