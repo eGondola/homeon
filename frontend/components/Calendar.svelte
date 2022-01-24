@@ -9,48 +9,39 @@
         text: string;
     };
     export let date: Date;
-    let innerWidth:number;
+    let innerWidth: number;
     $: monday = getMonday(date);
     $: nextMonday = addDays(monday, 7);
     $: dayPlans = generateDayPlans(plans, monday, nextMonday);
     $: {
-        let day:number
-        if(innerWidth < 800)
-        {
-            let d = date
-            day = d.getDay() ? d.getDay() - 1 : 6
+        let day: number;
+        if (innerWidth < 800) {
+            let d = date;
+            day = d.getDay() ? d.getDay() - 1 : 6;
             let arr = document.querySelectorAll<HTMLElement>(".day");
             let tab = document.querySelectorAll<HTMLElement>(".day-header");
-            for(let i=0;i<arr.length;i++)
-            {
-                if(day != i)
-                {
+            for (let i = 0; i < arr.length; i++) {
+                if (day != i) {
                     arr[i].style.display = "none";
                     tab[i].style.display = "none";
-                }
-                else
-                {
+                } else {
                     arr[i].style.display = "block";
                     tab[i].style.display = "block";
                 }
             }
-        }
-        else
-        {
+        } else {
             let arr = document.querySelectorAll<HTMLElement>(".day");
             let tab = document.querySelectorAll<HTMLElement>(".day-header");
-            for(let i=0;i<arr.length;i++)
-            {
+            for (let i = 0; i < arr.length; i++) {
                 arr[i].style.display = "block";
                 tab[i].style.display = "block";
             }
         }
-        
     }
     function generateDayPlans(plans: Plans, weekBegin: Date, weekEnd: Date) {
         const dayPlans: DayPlan[][] = Array.from({ length: 7 }, () => []);
         for (const { start, end, text } of plans.filter(isThisWeek)) {
-            let i = 0//start <= monday ? 0 : start.getDay() - 1;
+            let i = 0;
             let current: Date;
             do {
                 current = addDays(monday, i);
@@ -96,7 +87,9 @@
         return new Date(
             date.getFullYear(),
             date.getMonth(),
-            date.getDay() == 0 ? date.getDate() - 6 : date.getDate() - date.getDay() + 1
+            date.getDay() == 0
+                ? date.getDate() - 6
+                : date.getDate() - date.getDay() + 1
         );
     }
     function isSameDate(first: Date, second: Date) {
@@ -116,16 +109,17 @@
         "Niedziela",
     ];
 </script>
+
 <svelte:window bind:innerWidth />
 <div class="calendar">
     <div class="calendar-header">
         <div class="date-texts">
             {#if innerWidth < 800}
-                <DateText date={date}/>
+                <DateText {date} />
             {:else}
-                <DateText date={monday}/>
+                <DateText date={monday} />
                 <br />
-                <DateText date={nextMonday}/>
+                <DateText date={nextMonday} />
             {/if}
         </div>
         <div class="days-header">
@@ -233,6 +227,7 @@
                     .plan {
                         background-color: aqua;
                         position: absolute;
+                        width: calc(100% - 5vmin);
                     }
                 }
             }

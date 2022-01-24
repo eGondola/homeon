@@ -2,12 +2,11 @@
     import Calendar from "../components/Calendar.svelte";
     import { addDays } from "../util/date";
     import * as api from "../util/api";
+    import { getContext } from "svelte";
 
-    export let groups: any;
+    $: group = getContext<any>("group");
 
-    $: currentGroup = groups[0];
-
-    $: plans = currentGroup.plans.map(({ start, end, text }: any) => ({
+    $: plans = $group.plans.map(({ start, end, text }: any) => ({
         start: new Date(start),
         end: new Date(end),
         text,
@@ -55,18 +54,8 @@
 <Calendar {plans} {date} />
 <form
     on:submit|preventDefault={() => {
-        api.post("add-group", {
-            name: groupName,
-        });
-    }}
->
-    <input type="text" bind:value={groupName} />
-    <button type="submit">Dodaj grupę</button>
-</form>
-<form
-    on:submit|preventDefault={() => {
         api.post("add-plan", {
-            token: currentGroup.token,
+            token: group.token,
             plan: {
                 start,
                 end,
@@ -88,22 +77,6 @@
     <input type="text" bind:value={text} />
     <button type="submit">Dodaj plan</button>
 </form>
-<ul>
-    {#each groups as group}
-        <li>
-            <button
-                on:click={() => {
-                    currentGroup = group;
-                }}>{group.name}</button
-            >
-            <input
-                type="text"
-                value={`${location.protocol}//${location.host}/group/${group.token}`}
-                disabled
-            />
-        </li>
-    {/each}
-</ul>
 
 <style lang="scss">
     @import "../styles/variables.scss";
