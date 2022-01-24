@@ -73,7 +73,7 @@
                     {/await}
                 </Route>
 
-                <Route path="/test">
+                <Route path="/shopping-list">
                     <List />
                 </Route>
 

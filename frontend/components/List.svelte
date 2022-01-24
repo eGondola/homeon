@@ -1,19 +1,19 @@
 <script type="ts">
     import { onMount } from "svelte";
 
-    interface Item {
+    interface ListElement {
         id: number;
         count: number;
         text: string;
     }
 
-    let list: Item[] = [];
+    let list: ListElement[] = [];
     let text: string;
     let count: number;
     let message: string = "";
 
     onMount(async () => {
-        const rawResponse = await fetch("/test", {
+        const rawResponse = await fetch("/shopping-list", {
             method: "POST",
             headers: {
                 Accept: "application/json",

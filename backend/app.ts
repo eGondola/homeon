@@ -54,6 +54,7 @@ async function main() {
             name: req.body.name,
             token,
             plans: [],
+            groups: []
         });
         database.users.updateOne(
             { login: req.session?.user.login },
@@ -90,7 +91,7 @@ async function main() {
         res.sendFile(path.resolve("frontend/public/index.html"));
     });
 
-    app.post("/test", async (req, res) => {
+    app.post("/shopping-list", async (req, res) => {
         let list = await database.list.find({}).toArray();
         res.send(list);
     });
@@ -138,6 +139,7 @@ async function main() {
                 name: "Osobiste",
                 token: personalGroupToken,
                 plans: [],
+                groups: []
             }),
         ]);
 
