@@ -5,87 +5,94 @@
     import List from "./components/list.svelte";
     import CalendarPage from "./pages/CalendarPage.svelte";
     import * as api from "./util/api";
+
+    import Groups from "./components/Groups.svelte";
 </script>
 
 {#await api.get("checkLogin") then user}
     {#if !user.login}
         <Authorization />
     {:else}
-        <Router>
-            <div class="home">
-                <div class="user-profile">
-                    <div>
+        {#await api.get("groups") then groups}
+            <Router>
+                <div class="home">
+                    <div class="user-profile">
                         <div>
-                            {user.login}
-                            <button
-                                on:click={async () => {
-                                    await fetch("/logout");
-                                    location.replace("/");
-                                }}>Wyloguj</button
-                            >
+                            <div>
+                                {user.login}
+                                <button
+                                    on:click={async () => {
+                                        await fetch("/logout");
+                                        location.replace("/");
+                                    }}>Wyloguj</button
+                                >
+                            </div>
+                        </div>
+                        <div>
+                            <a href="/" use:link><div class="home" /></a>
                         </div>
                     </div>
-                    <div>
-                        <a href="/" use:link><div class="home" /></a>
-                    </div>
+                    <Groups {groups}>
+                        <Route path="/">
+                            <div class="info-block">
+                                <div>
+                                    <div />
+                                    <div />
+                                </div>
+                            </div>
+
+                            <div class="navigation">
+                                <div>
+                                    <div>
+                                        <div>
+                                            <a href="/home-manage" use:link>
+                                                <div class="home-manage" />
+                                            </a>
+                                            <a href="/plans" use:link>
+                                                <div class="plans" />
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div>
+                                            <a href="/shopping-list" use:link>
+                                                <div class="shopping-list" />
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div>
+                                            <a
+                                                href="/household-duties"
+                                                use:link
+                                            >
+                                                <div class="household-duties" />
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </Route>
+
+                        <Route path="/plans">
+                            <CalendarPage />
+                        </Route>
+
+                        <Route path="/shopping-list">
+                            <List />
+                        </Route>
+
+                        <Route path="/confirm/:token">
+                            <p>Udało się potwierdzić email</p>
+                        </Route>
+
+                        <Route>
+                            <p style="text-align: center">404 Not Found</p>
+                        </Route>
+                    </Groups>
                 </div>
-                <Route path="/">
-                    <div class="info-block">
-                        <div>
-                            <div />
-                            <div />
-                        </div>
-                    </div>
-
-                    <div class="navigation">
-                        <div>
-                            <div>
-                                <div>
-                                    <a href="/home-manage" use:link>
-                                        <div class="home-manage" />
-                                    </a>
-                                    <a href="/plans" use:link>
-                                        <div class="plans" />
-                                    </a>
-                                </div>
-                            </div>
-                            <div>
-                                <div>
-                                    <a href="/shopping-list" use:link>
-                                        <div class="shopping-list" />
-                                    </a>
-                                </div>
-                            </div>
-                            <div>
-                                <div>
-                                    <a href="/household-duties" use:link>
-                                        <div class="household-duties" />
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </Route>
-
-                <Route path="/plans">
-                    {#await api.get("groups") then groups}
-                        <CalendarPage {groups} />
-                    {/await}
-                </Route>
-
-                <Route path="/shopping-list">
-                    <List />
-                </Route>
-
-                <Route path="/confirm/:token">
-                    <p>Udało się potwierdzić email</p>
-                </Route>
-
-                <Route>
-                    <p style="text-align: center">404 Not Found</p>
-                </Route>
-            </div>
-        </Router>
+            </Router>
+        {/await}
     {/if}
 {/await}
 
