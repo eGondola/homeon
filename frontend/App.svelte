@@ -20,7 +20,7 @@
                             <button
                                 on:click={async () => {
                                     await fetch("/logout");
-                                    location.reload();
+                                    location.replace("/");
                                 }}>Wyloguj</button
                             >
                         </div>
