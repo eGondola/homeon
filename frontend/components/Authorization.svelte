@@ -67,7 +67,6 @@
 <script type="ts">
     import LoginForm from "./Authorization/LoginForm.svelte";
     import RegisterForm from "./Authorization/RegisterForm.svelte";
-    import "./Authorization/ConfirmEmail";
 
     let buttonSwitch = true
     let buttonSwitchValue = "Mam już konto"

@@ -33,8 +33,12 @@ async function main() {
         res.send(await login(req));
     });
 
-    app.post("/confirm", async (req, res) => {
-        res.send(await confirm(req));
+    app.get("/confirm/:token", async (req, res, next) => {
+        if (await confirm(req)) {
+            next();
+        } else {
+            res.send("beka z ciebie");
+        }
     });
 
     app.get("/logout", async (req, res) => {
@@ -142,26 +146,24 @@ async function main() {
     }
 
     async function confirm(req: any) {
-        const confirmEmailToken = req.body.confirmEmailToken;
+        const confirmEmailToken = req.params.token;
         const user: any = await database.users.findOne({
             confirmEmailToken,
         });
 
-        if (user) {
-            await database.users.updateOne(
-                { confirmEmailToken },
-                { $unset: { confirmEmailToken: 1 } }
-            );
+        if (!user) return false;
 
-            req.session.user = {
-                login: user.login,
-                email: user.email,
-            };
+        await database.users.updateOne(
+            { confirmEmailToken },
+            { $unset: { confirmEmailToken: 1 } }
+        );
 
-            return true;
-        }
+        req.session.user = {
+            login: user.login,
+            email: user.email,
+        };
 
-        return false;
+        return true;
     }
 
     async function login(req: any) {

@@ -77,6 +77,10 @@
                     <List />
                 </Route>
 
+                <Route path="/confirm/:token">
+                    <p>Udało się potwierdzić email</p>
+                </Route>
+
                 <Route>
                     <p style="text-align: center">404 Not Found</p>
                 </Route>
