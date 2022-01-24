@@ -1,5 +1,11 @@
 <script type="ts">
-    import { onMount } from "svelte";
+import type { log } from "console";
+
+import type { Console } from "console";
+
+    import type { stringify } from "querystring";
+    import type { log } from "console";
+    import { getContext, onMount } from "svelte";
 
     interface ListElement {
         id: number;
@@ -12,6 +18,7 @@
     let count: number;
     let message: string = "";
 
+    const currentGroup = getContext<any>("group");
     onMount(async () => {
         const rawResponse = await fetch("/shopping-list", {
             method: "POST",
@@ -19,6 +26,7 @@
                 Accept: "application/json",
                 "Content-Type": "application/json",
             },
+            body: JSON.stringify($currentGroup)
         });
         list = await rawResponse.json();
     });
@@ -29,11 +37,10 @@
         });
         updateList(list);
     }
-
     function updateList(list: Item[]) {
         fetch("/updateList", {
             method: "POST",
-            body: JSON.stringify(list),
+            body: JSON.stringify([list, $currentGroup]),
         });
     }
 
@@ -45,11 +52,11 @@
             max++;
             list.push({ text: text, count: count, id: max });
             list = list;
-
-            fetch("/addToList", {
+            updateList(list)
+            /*fetch("/addToList", {
                 method: "POST",
                 body: JSON.stringify({ text: text, count: count }),
-            });
+            });*/
             text = "";
             count = 0;
             message = "";

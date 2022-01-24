@@ -37,7 +37,7 @@ type Group = {
     name: string;
     token: string;
     plans: Plan[];
-    groups: ListElement[];
+    list: ListElement[];
 };
 
 type Plan = {

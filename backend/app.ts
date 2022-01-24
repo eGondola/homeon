@@ -54,7 +54,7 @@ async function main() {
             name: req.body.name,
             token,
             plans: [],
-            groups: []
+            list: []
         });
         database.users.updateOne(
             { login: req.session?.user.login },
@@ -92,15 +92,18 @@ async function main() {
     });
 
     app.post("/shopping-list", async (req, res) => {
-        let list = await database.list.find({}).toArray();
-        res.send(list);
+        //let list = await database.list.find({}).toArray();
+        let group = await database.groups.findOne({token: req.body.token});
+        res.send(group?.list);
     });
 
     app.post("/updateList", (req, res) => {
         //error
-        database.list.drop();
+        //database.list.drop();
+        let [list, group] = JSON.parse(req.body)
         if (JSON.parse(req.body).length > 0)
-            database.list.insertMany(JSON.parse(req.body));
+            database.groups.updateOne({token: group.token}, {$set: {list: list}})
+            //database.list.insertMany(JSON.parse(req.body));
     });
 
     app.post("/addToList", async (req, res) => {
@@ -139,7 +142,7 @@ async function main() {
                 name: "Osobiste",
                 token: personalGroupToken,
                 plans: [],
-                groups: []
+                list: []
             }),
         ]);
 
