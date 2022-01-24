@@ -125,7 +125,7 @@ async function main() {
         if (login) return "Podany login jest już zajęty";
 
         const personalGroupToken = nanoid();
-        const confirmEmailToken = "r" + nanoid();
+        const confirmEmailToken = nanoid();
 
         await Promise.all([
             database.users.insertOne({
