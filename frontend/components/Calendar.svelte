@@ -240,17 +240,21 @@
 
     .calendar {
         font-size: 5vmin;
-        @media (min-width: 800px) {font-size: 3vmin;}
-        
+        @media (min-width: 800px) {
+            font-size: 3vmin;
+        }
+
         font-variant: small-caps;
-        
+
         .calendar-header {
             display: flex;
             flex-flow: row;
 
             .date-texts {
                 width: 15vmin;
-                @media (min-width: 800px) {width: 10vmin;}
+                @media (min-width: 800px) {
+                    width: 10vmin;
+                }
                 text-align: center;
             }
 
@@ -275,19 +279,23 @@
 
             .hours {
                 width: 15vmin;
-                @media (min-width: 800px) {width: 10vmin;}
+                @media (min-width: 800px) {
+                    width: 10vmin;
+                }
 
                 .hour {
                     margin: 1vmin;
                     text-align: center;
                     font-size: 3.5vmin;
-                    @media (min-width: 800px) {font-size: 2.5vmin;}
+                    @media (min-width: 800px) {
+                        font-size: 2.5vmin;
+                    }
                 }
             }
 
             .week {
                 flex: 1;
-                
+
                 display: flex;
                 flex-flow: row;
 

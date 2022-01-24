@@ -1,81 +1,83 @@
 <script type="ts">
-    import { onMount } from 'svelte';
-    interface item{
-        id:number,
-        count: number,
-        text: string,
+    import { onMount } from "svelte";
+
+    interface Item {
+        id: number;
+        count: number;
+        text: string;
     }
-    let List:item[] = [];
+
+    let list: Item[] = [];
     let text: string;
     let count: number;
-    let message:string = "";
+    let message: string = "";
+
     onMount(async () => {
         const rawResponse = await fetch("/test", {
-            method: 'POST',
+            method: "POST",
             headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
         });
-        List = await rawResponse.json();
+        list = await rawResponse.json();
     });
-    function DeleteItem(id:number)
-    {
-        List = List.filter((item) => {return item.id != id});
-        UpdateList(List);
+
+    function deleteItem(id: number) {
+        list = list.filter((item) => {
+            return item.id != id;
+        });
+        updateList(list);
     }
-    function UpdateList(list:item[])
-    {
+
+    function updateList(list: Item[]) {
         fetch("/updateList", {
-            method: 'POST',
-            body: JSON.stringify(list)
+            method: "POST",
+            body: JSON.stringify(list),
         });
     }
-    function SendForm()
-    {  
-        if(text.trim().length > 2 && count > 0)
-        {
+
+    function sendForm() {
+        if (text.trim().length > 2 && count > 0) {
             let max = 0;
-            for(let i=0;i<List.length;i++)
-                if(max < List[i].id)
-                    max = List[i].id;
+            for (let i = 0; i < list.length; i++)
+                if (max < list[i].id) max = list[i].id;
             max++;
-            List.push({'text': text, 'count': count, id: max});
-            List = List;
-            
+            list.push({ text: text, count: count, id: max });
+            list = list;
+
             fetch("/addToList", {
-                method: 'POST',
-                body: JSON.stringify({'text': text, 'count': count})
+                method: "POST",
+                body: JSON.stringify({ text: text, count: count }),
             });
             text = "";
             count = 0;
             message = "";
-        }
-        else
-        {
+        } else {
             message = "Kurwa co ty robisz pecie pierdolony";
         }
     }
 </script>
 
-{#each List as item}
+{#each list as item}
     <div class="card">
         <div class="num-display">
-            {item.count} 
+            {item.count}
         </div>
-        <div class="close" on:click={() => DeleteItem(item.id)}>X</div>
+        <div class="close" on:click={() => deleteItem(item.id)}>X</div>
         <p class="text-display">
             {item.text}
-            <br>
+            <br />
         </p>
     </div>
 {/each}
 <div class="input-group">
-    <input type="text" bind:value={text}>
-    <input type="number" bind:value={count}>
-    <input type="submit" on:click={SendForm}>
+    <input type="text" bind:value={text} />
+    <input type="number" bind:value={count} />
+    <input type="submit" on:click={sendForm} />
 </div>
 {message}
+
 <style>
     .num-display {
         position: absolute;
@@ -100,8 +102,8 @@
         background: none;
         border: none;
     }
-    .card
-    {
+
+    .card {
         background-color: rgb(121, 3, 121);
         color: rgb(233, 233, 255);
         border-radius: 15px;
@@ -109,20 +111,22 @@
         margin: 20px 0;
         position: relative;
     }
+
     .input-group {
-    background-color: rgb(121, 3, 121);
-    display: flex;
-    flex-direction: row;
-    border: 1px solid #ccc;
-    padding: 8px 10px;
-    border-radius: 8px;
-  }
-  input {
-    margin: 5px;
-    font-size: 16px;
-  }
-  
-  input:focus {
-    outline: none;
-  }
+        background-color: rgb(121, 3, 121);
+        display: flex;
+        flex-direction: row;
+        border: 1px solid #ccc;
+        padding: 8px 10px;
+        border-radius: 8px;
+    }
+
+    input {
+        margin: 5px;
+        font-size: 16px;
+    }
+
+    input:focus {
+        outline: none;
+    }
 </style>
