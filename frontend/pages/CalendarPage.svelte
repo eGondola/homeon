@@ -3,8 +3,8 @@
     import { addDays } from "../util/date";
     import * as api from "../util/api";
     import { getContext } from "svelte";
-import { write } from "fs";
-import { writable } from "svelte/store";
+    import { writable } from "svelte/store";
+    import DateText from "../components/DateText.svelte"
 
     $: group = getContext<any>("group");
 
@@ -60,13 +60,15 @@ import { writable } from "svelte/store";
         >
     </div>
 </div>
-{#if !$showPlan}
-   
-    <Calendar {plans} {date} {showPlan}/> 
-{:else}
-    {$showPlan.start}
-    {$showPlan.end}
+
+<Calendar {plans} {date} {showPlan}/> 
+{#if $showPlan}
+<div class="PlanDescription">
+    <DateText date={$showPlan.start} /><br>
+    <DateText date={$showPlan.end} /><br>
     {$showPlan.text}
+    <button on:click={() => {showPlan.set(false)}}>cofnij</button>
+</div>
 {/if}
 <form
     on:submit|preventDefault={() => {
@@ -96,7 +98,11 @@ import { writable } from "svelte/store";
 
 <style lang="scss">
     @import "../styles/variables.scss";
-
+    .PlanDescription
+    {
+        display: flex;
+        border: 1px solid black;
+    }
     #arrows {
         display: flex;
         flex-flow: row;
