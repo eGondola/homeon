@@ -1,24 +1,9 @@
 <script type="ts">
     import Calendar from "../components/Calendar.svelte";
     import { addDays } from "../util/date";
-    import * as api from "../util/api";
-    import { getContext } from "svelte";
-import { write } from "fs";
-import { writable } from "svelte/store";
-
-    $: group = getContext<any>("group");
-
-    $: plans = $group.plans.map(({ start, end, text }: any) => ({
-        start: new Date(start),
-        end: new Date(end),
-        text,
-    }));
+    import { writable } from "svelte/store";
 
     let date = new Date();
-    let groupName = "";
-    let start = Date.now();
-    let end = Date.now();
-    let text = "";
     let innerWidth: number;
     let showPlan = writable<false | Plan>(false);
     type Plan = {
@@ -61,38 +46,12 @@ import { writable } from "svelte/store";
     </div>
 </div>
 {#if !$showPlan}
-   
-    <Calendar {plans} {date} {showPlan}/> 
+    <Calendar {date} {showPlan}/> 
 {:else}
     {$showPlan.start}
     {$showPlan.end}
     {$showPlan.text}
 {/if}
-<form
-    on:submit|preventDefault={() => {
-        api.post("add-plan", {
-            token: $group.token,
-            plan: {
-                start,
-                end,
-                text,
-            },
-        });
-        plans = [
-            ...plans,
-            {
-                start: new Date(start),
-                end: new Date(end),
-                text,
-            },
-        ];
-    }}
->
-    <input type="datetime-local" bind:value={start} />
-    <input type="datetime-local" bind:value={end} />
-    <input type="text" bind:value={text} />
-    <button type="submit">Dodaj plan</button>
-</form>
 
 <style lang="scss">
     @import "../styles/variables.scss";
