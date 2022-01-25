@@ -40,7 +40,7 @@
             <form
                 on:submit|preventDefault={() => {addGroup()}}
             >
-                <span on:click={() => {addGroupButton()}}>{groupSwitch ? "+" : "x"}</span>
+                <span on:click={() => {addGroupButton()}}><i class={groupSwitch ? 'icon-plus' : 'icon-x'} /></span>
                 {#if !groupSwitch}
                 <span id="add_group_form">
                     <input type="text" bind:value={name} />
@@ -53,8 +53,9 @@
         </div>
         {#if groupSwitch}
             {#each groups as group}
-                <div class:active={group == $currentGroup}>
+                <div>
                     <span
+                        class:active={group == $currentGroup}
                         on:click={() => {
                             currentGroup.set(group);
                         }}>{group.name}</span
@@ -72,14 +73,15 @@
 {/if}
 <slot />
 
+<link rel="stylesheet" href="fontello/css/fontello.css" />
 <style lang="scss">
     @import "../styles/variables.scss";
-    .active {
-        color: rebeccapurple ;
-    }
+    
     #top {
         display: flex;
         flex-flow: column;
+        align-items: center;
+        justify-content: center;
         height: 100%;
 
         #groups {
@@ -156,6 +158,16 @@
 
                     background-color: $p-color;
                     box-shadow: -0.5vmin -0.5vmin 1vmin 0vmin #00000040, 0.5vmin 0.5vmin 1vmin 0vmin #00000040;
+                }
+
+                > form > span {
+                    &:nth-child(1) {
+                        padding: 2vmin;
+                    }
+                }
+
+                .active {
+                    background-color: $p-color-light;
                 }
             }
         }

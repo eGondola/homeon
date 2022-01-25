@@ -3,3 +3,7 @@
 .icon-right-dir:before { content: '\e801'; } /* '' */
 .icon-left-open:before { content: '\e802'; } /* '' */
 .icon-right-open:before { content: '\e803'; } /* '' */
+.icon-plus:before { content: '\e804'; } /* '' */
+.icon-x:before { content: '\e805'; } /* '' */
+.icon-profile:before { content: '\e806'; } /* '' */
+.icon-home:before { content: '\e807'; } /* '' */
