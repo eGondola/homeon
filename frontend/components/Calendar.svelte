@@ -41,7 +41,7 @@
     function generateDayPlans(plans: Plans, weekBegin: Date, weekEnd: Date) {
         const dayPlans: DayPlan[][] = Array.from({ length: 7 }, () => []);
         for (const { start, end, text } of plans.filter(isThisWeek)) {
-            let i = 0;
+            let i = start <= monday ? 0 : start.getDay() - 1;
             let current: Date;
             do {
                 current = addDays(monday, i);

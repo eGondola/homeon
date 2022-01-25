@@ -107,7 +107,7 @@ async function main() {
             //database.list.insertMany(JSON.parse(req.body));
     });
 
-    app.post("/addToList", async (req, res) => {
+    /*app.post("/addToList", async (req, res) => {
         let last: any = await database.list
             .find({})
             .sort({ _id: -1 })
@@ -117,7 +117,7 @@ async function main() {
         let d = JSON.parse(req.body);
         let obj = { id: last + 1, text: d.text, count: d.count };
         database.list.insertOne(obj);
-    });
+    });*/
 
     app.listen(process.env.PORT || 3000);
 

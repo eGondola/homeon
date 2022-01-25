@@ -1,10 +1,4 @@
 <script type="ts">
-import type { log } from "console";
-
-import type { Console } from "console";
-
-    import type { stringify } from "querystring";
-    import type { log } from "console";
     import { getContext, onMount } from "svelte";
 
     interface ListElement {
@@ -19,7 +13,14 @@ import type { Console } from "console";
     let message: string = "";
 
     const currentGroup = getContext<any>("group");
+    
     onMount(async () => {
+        GetList()
+    });
+
+    $: $currentGroup, GetList()
+
+    async function GetList() {
         const rawResponse = await fetch("/shopping-list", {
             method: "POST",
             headers: {
@@ -29,7 +30,7 @@ import type { Console } from "console";
             body: JSON.stringify($currentGroup)
         });
         list = await rawResponse.json();
-    });
+    }
 
     function deleteItem(id: number) {
         list = list.filter((item) => {
