@@ -225,7 +225,8 @@
                         <div class="column">
                             {#each column as { top, bottom, width, text }}
                                 <div
-                                    on:click={() => PlanClick(text)}
+                                    on:click|stopPropagation={() =>
+                                        PlanClick(text)}
                                     class="plan"
                                     style="top: {top * 100}%; bottom: {bottom *
                                         100}%; width: {width *
