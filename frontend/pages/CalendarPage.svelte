@@ -55,7 +55,7 @@
 <form
     on:submit|preventDefault={() => {
         api.post("add-plan", {
-            token: group.token,
+            token: $group.token,
             plan: {
                 start,
                 end,
