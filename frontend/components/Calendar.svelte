@@ -1,7 +1,9 @@
 <script type="ts">
     import DateText from "./DateText.svelte";
     import { addDays } from "../util/date";
+    import type { Writable } from "svelte/store";
     export let plans: Plans;
+    export let showPlan: Writable<Plan | false>;
     type Plans = Plan[];
     type Plan = {
         start: Date;
@@ -14,21 +16,48 @@
     $: nextMonday = addDays(monday, 7);
     $: dayPlans = generateDayPlans(plans, monday, nextMonday).map((plans) => {
         plans.sort((left, right) => right.top - left.top);
-        let columns: DayPlan[][] = [];
+        let columns: Rectangle[][] = [];
         while (plans.length > 0) {
-            let currentColumn: DayPlan[] = [remove(plans.length - 1)];
+            let currentColumn: Rectangle[] = [takeRectangle(plans.length - 1)];
             for (let i = plans.length - 1; i >= 0; --i) {
                 const { top } = plans[i];
                 if (1 - top < currentColumn[currentColumn.length - 1].bottom) {
-                    currentColumn.push(remove(i));
+                    currentColumn.push(takeRectangle(i));
                 }
             }
             columns.push(currentColumn);
         }
+        columns.forEach((currentColumn, i) => {
+            for (let j = i + 1; j < columns.length; ++j) {
+                for (const left of currentColumn) {
+                    if (j > i + left.width) {
+                        continue;
+                    }
+
+                    if (
+                        columns[j].every(
+                            (right) =>
+                                right.bottom < 1 - left.top &&
+                                left.bottom > 1 - right.top
+                        )
+                    ) {
+                        ++left.width;
+                    }
+                }
+            }
+        });
         return columns;
 
-        function remove(index: number) {
-            return plans.splice(index, 1)[0];
+        type Rectangle = DayPlan & {
+            width: number;
+        };
+
+        function takeRectangle(index: number) {
+            const [plan] = plans.splice(index, 1);
+            return {
+                ...plan,
+                width: 1,
+            };
         }
     });
     $: {
@@ -126,6 +155,15 @@
         bottom: number;
         text: string;
     };
+    function PlanClick(text: string) {
+        plans.forEach((plan) => {
+            if (plan.text == text) {
+                showPlan.set(plan);
+                console.log(plan);
+            }
+        });
+    }
+    $: console.log(showPlan);
 </script>
 
 <svelte:window bind:innerWidth />
@@ -157,11 +195,21 @@
                 <div class="day">
                     {#each columns as column}
                         <div class="column">
-                            {#each column as { top, bottom, text }}
+                            {#each column as { top, bottom, width, text }}
                                 <div
+                                    on:click={() => PlanClick(text)}
                                     class="plan"
                                     style="top: {top * 100}%; bottom: {bottom *
-                                        100}%"
+                                        100}%; width: {width *
+                                        100}%; background: {`hsl(${
+                                        ([...text].reduce(
+                                            (total, char) =>
+                                                total * char.charCodeAt(0),
+                                            1
+                                        ) *
+                                            16807) %
+                                        360
+                                    }, 100%, 70%)`}"
                                 >
                                     {text}
                                 </div>
@@ -255,7 +303,7 @@
                         .plan {
                             background-color: aqua;
                             position: absolute;
-                            width: calc(100% - 5vmin);
+                            width: 100%;
                         }
                     }
                 }

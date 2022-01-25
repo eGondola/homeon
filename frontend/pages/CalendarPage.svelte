@@ -3,6 +3,8 @@
     import { addDays } from "../util/date";
     import * as api from "../util/api";
     import { getContext } from "svelte";
+import { write } from "fs";
+import { writable } from "svelte/store";
 
     $: group = getContext<any>("group");
 
@@ -18,6 +20,13 @@
     let end = Date.now();
     let text = "";
     let innerWidth: number;
+    let showPlan = writable<false | Plan>(false);
+    type Plan = {
+        start: Date;
+        end: Date;
+        text: string;
+    };
+    $: console.log(showPlan)
 </script>
 
 <link rel="stylesheet" href="fontello/css/fontello.css" />
@@ -51,7 +60,14 @@
         >
     </div>
 </div>
-<Calendar {plans} {date} />
+{#if !$showPlan}
+   
+    <Calendar {plans} {date} {showPlan}/> 
+{:else}
+    {$showPlan.start}
+    {$showPlan.end}
+    {$showPlan.text}
+{/if}
 <form
     on:submit|preventDefault={() => {
         api.post("add-plan", {
