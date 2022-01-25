@@ -1,7 +1,9 @@
 <script type="ts">
     import DateText from "./DateText.svelte";
     import { addDays } from "../util/date";
+import type { Writable } from "svelte/store";
     export let plans: Plans;
+    export let showPlan: Writable<Plan | false>;
     type Plans = Plan[];
     type Plan = {
         start: Date;
@@ -126,6 +128,17 @@
         bottom: number;
         text: string;
     };
+    function PlanClick(text:string)
+    {
+        plans.forEach(plan => {
+            if(plan.text == text)
+            {
+                showPlan.set(plan)
+                console.log(plan)
+            }
+        })
+    }
+    $: console.log(showPlan)
 </script>
 
 <svelte:window bind:innerWidth />
@@ -158,7 +171,7 @@
                     {#each columns as column}
                         <div class="column">
                             {#each column as { top, bottom, text }}
-                                <div
+                                <div on:click={() => PlanClick(text)}
                                     class="plan"
                                     style="top: {top * 100}%; bottom: {bottom *
                                         100}%"
