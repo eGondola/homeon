@@ -7,7 +7,7 @@
     import * as api from "./util/api";
 
     import Groups from "./components/Groups.svelte";
-    let showGroups = false;
+    let showGroups = true;
 </script>
 
 {#await api.get("checkLogin") then user}
@@ -19,6 +19,7 @@
                 <div class="home">
                     <div class="user-profile">
                         <div id="profile">
+                            <i class="icon-profile" />
                             <!-- {user.login}
                             <button
                                 on:click={async () => {
@@ -29,7 +30,7 @@
                         </div>
                         <div id="show_groups" on:click={() => { showGroups = !showGroups }}>Pokaż grupy</div>
                         <div id="go_home">
-                            <a href="/" use:link><div id="home" /></a>
+                            <a href="/" use:link><i class="icon-home" /></a>
                         </div>
                     </div>
                     <Groups {groups} {showGroups}>
@@ -116,6 +117,8 @@
             //padding: 4vmin;
             height: 13vmin;
 
+            font-size: 5vmin;
+
             //background-color: $p-color-dark;
 
             > div {
@@ -162,14 +165,18 @@
                     width: 12vmin;
                     height: 12vmin;
 
-                    #home {
-                        width: 100%;
-                        height: 100%;
-                        background-repeat: no-repeat;
-                        background-position: center;
-                        background-image: url("icons/home.png");
-                        background-size: 65%;
-                    }
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    // #home {
+                    //     width: 100%;
+                    //     height: 100%;
+                    //     background-repeat: no-repeat;
+                    //     background-position: center;
+                    //     background-image: url("icons/home.png");
+                    //     background-size: 65%;
+                    // }
                 }
             }
 
