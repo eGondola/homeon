@@ -3,8 +3,8 @@
     import { addDays } from "../util/date";
     import * as api from "../util/api";
     import { getContext } from "svelte";
-import { write } from "fs";
-import { writable } from "svelte/store";
+    import { writable } from "svelte/store";
+    import DateText from "../components/DateText.svelte"
 
     $: group = getContext<any>("group");
 
@@ -15,10 +15,6 @@ import { writable } from "svelte/store";
     }));
 
     let date = new Date();
-    let groupName = "";
-    let start = Date.now();
-    let end = Date.now();
-    let text = "";
     let innerWidth: number;
     let showPlan = writable<false | Plan>(false);
     type Plan = {
@@ -58,43 +54,24 @@ import { writable } from "svelte/store";
         >
     </div>
 </div>
-{#if !$showPlan}
-   
-    <Calendar {plans} {date} {showPlan}/> 
-{:else}
-    {$showPlan.start}
-    {$showPlan.end}
+
+<Calendar {date} {showPlan}/> 
+{#if $showPlan}
+<div class="PlanDescription">
+    <DateText date={$showPlan.start} /><br>
+    <DateText date={$showPlan.end} /><br>
     {$showPlan.text}
+    <button on:click={() => {showPlan.set(false)}}>cofnij</button>
+</div>
 {/if}
-<form
-    on:submit|preventDefault={() => {
-        api.post("add-plan", {
-            token: $group.token,
-            plan: {
-                start,
-                end,
-                text,
-            },
-        });
-        plans = [
-            ...plans,
-            {
-                start: new Date(start),
-                end: new Date(end),
-                text,
-            },
-        ];
-    }}
->
-    <input type="datetime-local" bind:value={start} />
-    <input type="datetime-local" bind:value={end} />
-    <input type="text" bind:value={text} />
-    <button type="submit">Dodaj plan</button>
-</form>
 
 <style lang="scss">
     @import "../styles/variables.scss";
-
+    .PlanDescription
+    {
+        display: flex;
+        border: 1px solid black;
+    }
     #arrows {
         display: flex;
         flex-flow: row;

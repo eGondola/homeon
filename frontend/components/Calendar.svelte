@@ -2,8 +2,16 @@
     import DateText from "./DateText.svelte";
     import { addDays } from "../util/date";
     import type { Writable } from "svelte/store";
-    export let plans: Plans;
+    import * as api from "../util/api";
+    import { getContext } from "svelte";
     export let showPlan: Writable<Plan | false>;
+    const group = getContext<any>("group");
+    let plans: Plans = $group.plans.map(({ start, end, text }: any) => ({
+        start: new Date(start),
+        end: new Date(end),
+        text,
+    }));
+    let popupShown = false;
     type Plans = Plan[];
     type Plan = {
         start: Date;
@@ -12,6 +20,9 @@
     };
     export let date: Date;
     let innerWidth: number;
+    let start = Date.now();
+    let end = Date.now();
+    let text = "";
     $: monday = getMonday(date);
     $: nextMonday = addDays(monday, 7);
     $: dayPlans = generateDayPlans(plans, monday, nextMonday).map((plans) => {
@@ -192,7 +203,9 @@
         </div>
         <div class="week">
             {#each dayPlans as columns}
-                <div class="day">
+                <div class="day" on:click={() => {
+                    popupShown = true;
+                }}>
                     {#each columns as column}
                         <div class="column">
                             {#each column as { top, bottom, width, text }}
@@ -221,9 +234,47 @@
         </div>
     </div>
 </div>
+<div class="popup" class:shown={popupShown}>
+    <form
+        on:submit|preventDefault={() => {
+            api.post("add-plan", {
+                token: $group.token,
+                plan: {
+                    start,
+                    end,
+                    text,
+                },
+            });
+            plans = [
+                ...plans,
+                {
+                    start: new Date(start),
+                    end: new Date(end),
+                    text,
+                },
+            ];
+        }}
+    >
+        <input type="datetime-local" bind:value={start} />
+        <input type="datetime-local" bind:value={end} />
+        <input type="text" bind:value={text} />
+        <button type="submit">Dodaj plan</button>
+    </form>
+    <button type="button" on:click={() => {
+        popupShown = false;
+    }}>X</button>
+</div>
 
 <style lang="scss">
     @import "../styles/variables.scss";
+
+    .popup {
+        display: none;
+
+        &.shown {
+            display: block;
+        }
+    }
 
     .calendar {
         font-size: 5vmin;
