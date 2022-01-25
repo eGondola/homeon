@@ -1,7 +1,18 @@
 <script type="ts">
     import Calendar from "../components/Calendar.svelte";
     import { addDays } from "../util/date";
+    import * as api from "../util/api";
+    import { getContext } from "svelte";
     import { writable } from "svelte/store";
+    import DateText from "../components/DateText.svelte"
+
+    $: group = getContext<any>("group");
+
+    $: plans = $group.plans.map(({ start, end, text }: any) => ({
+        start: new Date(start),
+        end: new Date(end),
+        text,
+    }));
 
     let date = new Date();
     let innerWidth: number;
@@ -45,17 +56,24 @@
         >
     </div>
 </div>
-{#if !$showPlan}
-    <Calendar {date} {showPlan}/> 
-{:else}
-    {$showPlan.start}
-    {$showPlan.end}
+
+<Calendar {date} {showPlan}/> 
+{#if $showPlan}
+<div class="PlanDescription">
+    <DateText date={$showPlan.start} /><br>
+    <DateText date={$showPlan.end} /><br>
     {$showPlan.text}
+    <button on:click={() => {showPlan.set(false)}}>cofnij</button>
+</div>
 {/if}
 
 <style lang="scss">
     @import "../styles/variables.scss";
-
+    .PlanDescription
+    {
+        display: flex;
+        border: 1px solid black;
+    }
     #arrows {
         display: flex;
         flex-flow: row;
