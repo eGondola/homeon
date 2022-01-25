@@ -18,20 +18,18 @@
             <Router>
                 <div class="home">
                     <div class="user-profile">
-                        <div>
-                            <div>
-                                {user.login}
-                                <button
-                                    on:click={async () => {
-                                        await fetch("/logout");
-                                        location.replace("/");
-                                    }}>Wyloguj</button
-                                >
-                            </div>
-                            <button on:click={() => { showGroups = !showGroups }}>Pokaż grupy</button>
+                        <div id="profile">
+                            <!-- {user.login}
+                            <button
+                                on:click={async () => {
+                                    await fetch("/logout");
+                                    location.replace("/");
+                                }}>Wyloguj</button
+                            > -->
                         </div>
-                        <div>
-                            <a href="/" use:link><div class="home" /></a>
+                        <div id="show_groups" on:click={() => { showGroups = !showGroups }}>Pokaż grupy</div>
+                        <div id="go_home">
+                            <a href="/" use:link><div id="home" /></a>
                         </div>
                     </div>
                     <Groups {groups} {showGroups}>
@@ -113,57 +111,115 @@
         .user-profile {
             display: flex;
             flex-flow: row;
-            padding: 4vmin;
+            //align-items: center;
+            justify-content: center;
+            //padding: 4vmin;
+            height: 13vmin;
 
-            background-color: $p-color-dark;
+            //background-color: $p-color-dark;
 
             > div {
+                //height: 100%;
+
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+
+                background-color: $p-color-dark;
+                border-radius: 0vmin 0vmin 2vmin 2vmin;
+
+                text-transform: lowercase;
+                font-variant: small-caps;
+            }
+            
+
+            #profile {
+                height: 11vmin;
+                width: 11vmin;
+                margin: 1vmin;
+                border-radius: 50%;
+                //border: 1px solid red;
+                //border-radius: 50%;
+
+                //margin-left: 2vmin;
+                //margin-right: 2vmin;
+            }
+
+            #show_groups {
                 flex: 1;
+            }
 
-                &:nth-child(1) {
-                    display: flex;
+            #show_groups, #go_home {
+                height: 12vmin;
+                margin-right: 1vmin;
+                //border-left: 3px double $p-color-light;
 
-                    > div {
-                        display: flex;
-                        flex-flow: column;
-                        align-items: center;
-                        justify-content: left;
+                a {
+                    color: white;
+                    text-decoration: none;
 
-                        font-variant: small-caps;
-                        color: white;
+                    width: 12vmin;
+                    height: 12vmin;
 
-                        button {
-                            border: none;
-                            border-radius: 2vmin;
-
-                            padding: 3vmin 7.5vmin;
-                            margin: 1.5vmin;
-
-                            box-shadow: -0.5vmin -0.5vmin 1vmin 0vmin #00000040,
-                                0.5vmin 0.5vmin 1vmin 0vmin #00000040;
-
-                            background-color: $s-color-dark;
-                            color: white;
-                            font-size: 3vmin;
-                            text-transform: lowercase;
-                            font-variant: small-caps;
-                        }
-                    }
-                }
-
-                &:nth-child(2) {
-                    display: flex;
-                    justify-content: right;
-
-                    .home {
-                        width: 10vmin;
+                    #home {
+                        width: 100%;
+                        height: 100%;
                         background-repeat: no-repeat;
                         background-position: center;
                         background-image: url("icons/home.png");
-                        background-size: 90%;
+                        background-size: 65%;
                     }
                 }
             }
+
+            // > div {
+            //     flex: 1;
+
+            //     &:nth-child(1) {
+            //         display: flex;
+
+            //         > div {
+            //             display: flex;
+            //             flex-flow: column;
+            //             align-items: center;
+            //             justify-content: left;
+
+            //             font-variant: small-caps;
+            //             color: white;
+
+            //             button {
+            //                 border: none;
+            //                 //border-radius: 2vmin;
+
+            //                 //padding: 3vmin 7.5vmin;
+            //                 //margin: 1.5vmin;
+
+            //                 box-shadow: -0.5vmin -0.5vmin 1vmin 0vmin #00000040,
+            //                     0.5vmin 0.5vmin 1vmin 0vmin #00000040;
+
+            //                 background-color: $s-color-dark;
+            //                 color: white;
+            //                 //font-size: 3vmin;
+            //                 text-transform: lowercase;
+            //                 font-variant: small-caps;
+            //             }
+            //         }
+            //     }
+
+            //     &:nth-child(2) {
+            //         display: flex;
+            //         justify-content: right;
+
+            //         .home {
+            //             width: 10vmin;
+            //             background-repeat: no-repeat;
+            //             background-position: center;
+            //             background-image: url("icons/home.png");
+            //             background-size: 90%;
+            //         }
+            //     }
+            // }
         }
 
         .info-block {
