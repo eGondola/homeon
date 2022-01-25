@@ -14,7 +14,6 @@ export async function getDatabase() {
     await client.connect();
     const database = client.db(process.env.DB_NAME);
     return {
-        list: database.collection<ListElement>("list"),
         users: database.collection<User>("users"),
         groups: database.collection<Group>("groups"),
     };

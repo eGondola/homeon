@@ -53,7 +53,7 @@
         </div>
         {#if groupSwitch}
             {#each groups as group}
-                <div>
+                <div class:active={group == $currentGroup}>
                     <span
                         on:click={() => {
                             currentGroup.set(group);
@@ -74,7 +74,9 @@
 
 <style lang="scss">
     @import "../styles/variables.scss";
-
+    .active {
+        color: rebeccapurple ;
+    }
     #top {
         display: flex;
         flex-flow: column;
