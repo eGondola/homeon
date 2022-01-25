@@ -15,10 +15,6 @@
     }));
 
     let date = new Date();
-    let groupName = "";
-    let start = Date.now();
-    let end = Date.now();
-    let text = "";
     let innerWidth: number;
     let showPlan = writable<false | Plan>(false);
     type Plan = {
@@ -61,7 +57,7 @@
     </div>
 </div>
 
-<Calendar {plans} {date} {showPlan}/> 
+<Calendar {date} {showPlan}/> 
 {#if $showPlan}
 <div class="PlanDescription">
     <DateText date={$showPlan.start} /><br>
@@ -70,31 +66,6 @@
     <button on:click={() => {showPlan.set(false)}}>cofnij</button>
 </div>
 {/if}
-<form
-    on:submit|preventDefault={() => {
-        api.post("add-plan", {
-            token: $group.token,
-            plan: {
-                start,
-                end,
-                text,
-            },
-        });
-        plans = [
-            ...plans,
-            {
-                start: new Date(start),
-                end: new Date(end),
-                text,
-            },
-        ];
-    }}
->
-    <input type="datetime-local" bind:value={start} />
-    <input type="datetime-local" bind:value={end} />
-    <input type="text" bind:value={text} />
-    <button type="submit">Dodaj plan</button>
-</form>
 
 <style lang="scss">
     @import "../styles/variables.scss";
