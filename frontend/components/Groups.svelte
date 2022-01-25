@@ -73,7 +73,6 @@
 {/if}
 <slot />
 
-<link rel="stylesheet" href="fontello/css/fontello.css" />
 <style lang="scss">
     @import "../styles/variables.scss";
     

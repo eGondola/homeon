@@ -29,8 +29,6 @@ import { writable } from "svelte/store";
     $: console.log(showPlan)
 </script>
 
-<link rel="stylesheet" href="fontello/css/fontello.css" />
-
 <svelte:window bind:innerWidth />
 <div id="arrows">
     <div>
