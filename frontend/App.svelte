@@ -7,6 +7,7 @@
     import * as api from "./util/api";
 
     import Groups from "./components/Groups.svelte";
+    let showGroups = false;
 </script>
 
 {#await api.get("checkLogin") then user}
@@ -27,12 +28,13 @@
                                     }}>Wyloguj</button
                                 >
                             </div>
+                            <button on:click={() => { showGroups = !showGroups }}>Pokaż grupy</button>
                         </div>
                         <div>
                             <a href="/" use:link><div class="home" /></a>
                         </div>
                     </div>
-                    <Groups {groups}>
+                    <Groups {groups} {showGroups}>
                         <Route path="/">
                             <div class="info-block">
                                 <div>
@@ -78,7 +80,7 @@
                             <CalendarPage />
                         </Route>
 
-                        <Route path="/test">
+                        <Route path="/shopping-list">
                             <List />
                         </Route>
 

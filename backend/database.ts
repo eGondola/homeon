@@ -20,7 +20,10 @@ export async function getDatabase() {
     };
 }
 
-type ListElement = any; // Szyplo to twoja lista więc uzupełnij
+type ListElement = {
+    text: string;
+    count: number;
+};
 
 type User = {
     login: string;
@@ -34,6 +37,7 @@ type Group = {
     name: string;
     token: string;
     plans: Plan[];
+    list: ListElement[];
 };
 
 type Plan = {

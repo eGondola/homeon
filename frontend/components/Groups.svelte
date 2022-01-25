@@ -4,6 +4,7 @@
     import * as api from "../util/api";
 
     export let groups: any;
+    export let showGroups: any;
     let name: string;
 
     const currentGroup = writable(groups[0]);
@@ -32,7 +33,7 @@
         groupSwitch = !groupSwitch;
     }
 </script>
-
+{#if showGroups}
 <div id="top">
     <div id="groups">
         <div>
@@ -52,7 +53,7 @@
         </div>
         {#if groupSwitch}
             {#each groups as group}
-                <div>
+                <div class:active={group == $currentGroup}>
                     <span
                         on:click={() => {
                             currentGroup.set(group);
@@ -68,11 +69,14 @@
         {/if}
     </div>
 </div>
+{/if}
 <slot />
 
 <style lang="scss">
     @import "../styles/variables.scss";
-
+    .active {
+        color: rebeccapurple ;
+    }
     #top {
         display: flex;
         flex-flow: column;
