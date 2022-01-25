@@ -1,28 +1,27 @@
 <script type="ts">
-    import DateText from "./DateText.svelte";
-    import { addDays } from "../util/date";
     import type { Writable } from "svelte/store";
-    import * as api from "../util/api";
     import { getContext } from "svelte";
+    import DateText from "./DateText.svelte";
+    import * as api from "../util/api";
+    import { addDays } from "../util/date";
+
     export let showPlan: Writable<Plan | false>;
+    export let date: Date;
+
     const group = getContext<any>("group");
+
     let plans: Plans = $group.plans.map(({ start, end, text }: any) => ({
         start: new Date(start),
         end: new Date(end),
         text,
     }));
+
     let popupShown = false;
-    type Plans = Plan[];
-    type Plan = {
-        start: Date;
-        end: Date;
-        text: string;
-    };
-    export let date: Date;
     let innerWidth: number;
     let start = new Date().toISOString().slice(0, 16)
     let end = new Date(new Date(date).setHours(date.getHours() + 1)).toISOString().slice(0, 16)
     let text = "";
+
     $: monday = getMonday(date);
     $: nextMonday = addDays(monday, 7);
     $: dayPlans = generateDayPlans(plans, monday, nextMonday).map((plans) => {
@@ -71,13 +70,12 @@
             };
         }
     });
+
     $: {
-        let day: number;
+        let arr = document.querySelectorAll<HTMLElement>(".day");
+        let tab = document.querySelectorAll<HTMLElement>(".day-header");
         if (innerWidth < 800) {
-            let d = date;
-            day = d.getDay() ? d.getDay() - 1 : 6;
-            let arr = document.querySelectorAll<HTMLElement>(".day");
-            let tab = document.querySelectorAll<HTMLElement>(".day-header");
+            let day = date.getDay() ? date.getDay() - 1 : 6;
             for (let i = 0; i < arr.length; i++) {
                 if (day != i) {
                     arr[i].style.display = "none";
@@ -88,14 +86,13 @@
                 }
             }
         } else {
-            let arr = document.querySelectorAll<HTMLElement>(".day");
-            let tab = document.querySelectorAll<HTMLElement>(".day-header");
             for (let i = 0; i < arr.length; i++) {
                 arr[i].style.display = "flex";
                 tab[i].style.display = "block";
             }
         }
     }
+
     function generateDayPlans(plans: Plans, weekBegin: Date, weekEnd: Date) {
         const dayPlans: DayPlan[][] = Array.from({ length: 7 }, () => []);
         for (const { start, end, text } of plans.filter(isThisWeek)) {
@@ -116,6 +113,7 @@
             } while (!isSameDate(current, end) && i < 7);
         }
         return dayPlans;
+
         function isThisWeek({ start, end }: Plan) {
             return (
                 (start >= weekBegin && start <= weekEnd) ||
@@ -124,6 +122,7 @@
             );
         }
     }
+
     function generateHours() {
         const hours: string[] = [];
         for (let i = 0; i < 24; i++) {
@@ -131,11 +130,13 @@
         }
         return hours;
     }
+
     function getFractionOfDayPassed(date: Date) {
         const hours = date.getHours();
         const minutes = date.getMinutes();
         return (hours + minutes / 60) / 24;
     }
+
     function getMonday(date: Date) {
         return new Date(
             date.getFullYear(),
@@ -145,6 +146,7 @@
                 : date.getDate() - date.getDay() + 1
         );
     }
+
     function isSameDate(first: Date, second: Date) {
         return (
             first.getFullYear() == second.getFullYear() &&
@@ -152,6 +154,7 @@
             first.getDate() == second.getDate()
         );
     }
+
     const daysOfWeek = [
         "Poniedziałek",
         "Wtorek",
@@ -161,11 +164,7 @@
         "Sobota",
         "Niedziela",
     ];
-    type DayPlan = {
-        top: number;
-        bottom: number;
-        text: string;
-    };
+
     function PlanClick(text: string) {
         plans.forEach((plan) => {
             if (plan.text == text) {
@@ -174,7 +173,20 @@
             }
         });
     }
-    $: console.log(showPlan);
+
+    type DayPlan = {
+        top: number;
+        bottom: number;
+        text: string;
+    };
+
+    type Plans = Plan[];
+
+    type Plan = {
+        start: Date;
+        end: Date;
+        text: string;
+    };
 </script>
 
 <svelte:window bind:innerWidth />
@@ -203,14 +215,18 @@
         </div>
         <div class="week">
             {#each dayPlans as columns}
-                <div class="day" on:click={() => {
-                    popupShown = true;
-                }}>
+                <div
+                    class="day"
+                    on:click={() => {
+                        popupShown = true;
+                    }}
+                >
                     {#each columns as column}
                         <div class="column">
                             {#each column as { top, bottom, width, text }}
                                 <div
-                                    on:click={() => PlanClick(text)}
+                                    on:click|stopPropagation={() =>
+                                        PlanClick(text)}
                                     class="plan"
                                     style="top: {top * 100}%; bottom: {bottom *
                                         100}%; width: {width *
@@ -285,7 +301,7 @@
         position: fixed;
         
         height: 217vmin;
-        
+
         @media (min-width: 800px) {
             left: 50%;
             top: 50%;

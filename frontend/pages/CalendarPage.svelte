@@ -1,18 +1,8 @@
 <script type="ts">
     import Calendar from "../components/Calendar.svelte";
     import { addDays } from "../util/date";
-    import * as api from "../util/api";
-    import { getContext } from "svelte";
     import { writable } from "svelte/store";
     import DateText from "../components/DateText.svelte"
-
-    $: group = getContext<any>("group");
-
-    $: plans = $group.plans.map(({ start, end, text }: any) => ({
-        start: new Date(start),
-        end: new Date(end),
-        text,
-    }));
 
     let date = new Date();
     let innerWidth: number;
@@ -22,7 +12,6 @@
         end: Date;
         text: string;
     };
-    $: console.log(showPlan)
 </script>
 
 <svelte:window bind:innerWidth />

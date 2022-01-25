@@ -9,101 +9,113 @@
 
     import Groups from "./components/Groups.svelte";
     let showGroups = true;
-
-    let editProfile = true
+    let editProfile = false;
 </script>
 
 {#await api.get("checkLogin") then user}
     {#if !user.login}
         <Authorization />
+    {:else if editProfile}
+        <button
+            on:click={() => {
+                editProfile = !editProfile;
+            }}
+            style="position: fixed; top: 0; left: 0;">Wróć</button
+        >
+        <Profile />
     {:else}
-        {#if editProfile}
-            <button
-                on:click={() => {editProfile = !editProfile}} style="position: fixed; top: 0; left: 0;">Wróć</button
-            >
-            <Profile />
-        {:else}
-            {#await api.get("groups") then groups}
-                <Router>
-                    <div class="home">
-                        <div class="user-profile">
-                            <div id="profile" on:click={() => {editProfile = !editProfile}}>
-                                <i class="icon-profile" />
-                                <!-- {user.login}
+        {#await api.get("groups") then groups}
+            <Router>
+                <div class="home">
+                    <div class="user-profile">
+                        <div
+                            id="profile"
+                            on:click={() => {
+                                editProfile = !editProfile;
+                            }}
+                        >
+                            <i class="icon-profile" />
+                            <!-- {user.login}
                                 <button
                                     on:click={async () => {
                                         await fetch("/logout");
                                         location.replace("/");
                                     }}>Wyloguj</button
                                 > -->
-                            </div>
-                            <div id="show_groups" on:click={() => { showGroups = !showGroups }}>Pokaż grupy</div>
-                            <div id="go_home">
-                                <a href="/" use:link><i class="icon-home" /></a>
-                            </div>
                         </div>
-                        <Groups {groups} {showGroups}>
-                            <Route path="/">
-                                <div class="info-block">
-                                    <div>
-                                        <div />
-                                        <div />
-                                    </div>
-                                </div>
-
-                                <div class="navigation">
-                                    <div>
-                                        <div>
-                                            <div>
-                                                <a href="/home-manage" use:link>
-                                                    <div class="home-manage" />
-                                                </a>
-                                                <a href="/plans" use:link>
-                                                    <div class="plans" />
-                                                </a>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div>
-                                                <a href="/shopping-list" use:link>
-                                                    <div class="shopping-list" />
-                                                </a>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div>
-                                                <a
-                                                    href="/household-duties"
-                                                    use:link
-                                                >
-                                                    <div class="household-duties" />
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Route>
-
-                            <Route path="/plans">
-                                <CalendarPage />
-                            </Route>
-
-                            <Route path="/shopping-list">
-                                <List />
-                            </Route>
-
-                            <Route path="/confirm/:token">
-                                <p>Udało się potwierdzić email</p>
-                            </Route>
-
-                            <Route>
-                                <p style="text-align: center">404 Not Found</p>
-                            </Route>
-                        </Groups>
+                        <div
+                            id="show_groups"
+                            on:click={() => {
+                                showGroups = !showGroups;
+                            }}
+                        >
+                            Pokaż grupy
+                        </div>
+                        <div id="go_home">
+                            <a href="/" use:link><i class="icon-home" /></a>
+                        </div>
                     </div>
-                </Router>
-            {/await}
-        {/if}
+                    <Groups {groups} {showGroups}>
+                        <Route path="/">
+                            <div class="info-block">
+                                <div>
+                                    <div />
+                                    <div />
+                                </div>
+                            </div>
+
+                            <div class="navigation">
+                                <div>
+                                    <div>
+                                        <div>
+                                            <a href="/home-manage" use:link>
+                                                <div class="home-manage" />
+                                            </a>
+                                            <a href="/plans" use:link>
+                                                <div class="plans" />
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div>
+                                            <a href="/shopping-list" use:link>
+                                                <div class="shopping-list" />
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div>
+                                            <a
+                                                href="/household-duties"
+                                                use:link
+                                            >
+                                                <div class="household-duties" />
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </Route>
+
+                        <Route path="/plans">
+                            <CalendarPage />
+                        </Route>
+
+                        <Route path="/shopping-list">
+                            <List />
+                        </Route>
+
+                        <Route path="/confirm/:token">
+                            <p>Udało się potwierdzić email</p>
+                        </Route>
+
+                        <Route>
+                            <p style="text-align: center">404 Not Found</p>
+                        </Route>
+                    </Groups>
+                </div>
+            </Router>
+        {/await}
     {/if}
 {/await}
 
@@ -122,18 +134,12 @@
         .user-profile {
             display: flex;
             flex-flow: row;
-            //align-items: center;
             justify-content: center;
-            //padding: 4vmin;
             height: 13vmin;
 
             font-size: 5vmin;
 
-            //background-color: $p-color-dark;
-
             > div {
-                //height: 100%;
-
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -145,28 +151,22 @@
                 text-transform: lowercase;
                 font-variant: small-caps;
             }
-            
 
             #profile {
                 height: 11vmin;
                 width: 11vmin;
                 margin: 1vmin;
                 border-radius: 50%;
-                //border: 1px solid red;
-                //border-radius: 50%;
-
-                //margin-left: 2vmin;
-                //margin-right: 2vmin;
             }
 
             #show_groups {
                 flex: 1;
             }
 
-            #show_groups, #go_home {
+            #show_groups,
+            #go_home {
                 height: 12vmin;
                 margin-right: 1vmin;
-                //border-left: 3px double $p-color-light;
 
                 a {
                     color: white;
@@ -178,65 +178,8 @@
                     display: flex;
                     align-items: center;
                     justify-content: center;
-
-                    // #home {
-                    //     width: 100%;
-                    //     height: 100%;
-                    //     background-repeat: no-repeat;
-                    //     background-position: center;
-                    //     background-image: url("icons/home.png");
-                    //     background-size: 65%;
-                    // }
                 }
             }
-
-            // > div {
-            //     flex: 1;
-
-            //     &:nth-child(1) {
-            //         display: flex;
-
-            //         > div {
-            //             display: flex;
-            //             flex-flow: column;
-            //             align-items: center;
-            //             justify-content: left;
-
-            //             font-variant: small-caps;
-            //             color: white;
-
-            //             button {
-            //                 border: none;
-            //                 //border-radius: 2vmin;
-
-            //                 //padding: 3vmin 7.5vmin;
-            //                 //margin: 1.5vmin;
-
-            //                 box-shadow: -0.5vmin -0.5vmin 1vmin 0vmin #00000040,
-            //                     0.5vmin 0.5vmin 1vmin 0vmin #00000040;
-
-            //                 background-color: $s-color-dark;
-            //                 color: white;
-            //                 //font-size: 3vmin;
-            //                 text-transform: lowercase;
-            //                 font-variant: small-caps;
-            //             }
-            //         }
-            //     }
-
-            //     &:nth-child(2) {
-            //         display: flex;
-            //         justify-content: right;
-
-            //         .home {
-            //             width: 10vmin;
-            //             background-repeat: no-repeat;
-            //             background-position: center;
-            //             background-image: url("icons/home.png");
-            //             background-size: 90%;
-            //         }
-            //     }
-            // }
         }
 
         .info-block {
