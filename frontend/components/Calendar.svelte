@@ -12,7 +12,25 @@
     let innerWidth: number;
     $: monday = getMonday(date);
     $: nextMonday = addDays(monday, 7);
-    $: dayPlans = generateDayPlans(plans, monday, nextMonday);
+    $: dayPlans = generateDayPlans(plans, monday, nextMonday).map((plans) => {
+        plans.sort((left, right) => right.top - left.top);
+        let columns: DayPlan[][] = [];
+        while (plans.length > 0) {
+            let currentColumn: DayPlan[] = [remove(plans.length - 1)];
+            for (let i = plans.length - 1; i >= 0; --i) {
+                const { top } = plans[i];
+                if (1 - top < currentColumn[currentColumn.length - 1].bottom) {
+                    currentColumn.push(remove(i));
+                }
+            }
+            columns.push(currentColumn);
+        }
+        return columns;
+
+        function remove(index: number) {
+            return plans.splice(index, 1)[0];
+        }
+    });
     $: {
         let day: number;
         if (innerWidth < 800) {
@@ -25,7 +43,7 @@
                     arr[i].style.display = "none";
                     tab[i].style.display = "none";
                 } else {
-                    arr[i].style.display = "block";
+                    arr[i].style.display = "flex";
                     tab[i].style.display = "block";
                 }
             }
@@ -33,7 +51,7 @@
             let arr = document.querySelectorAll<HTMLElement>(".day");
             let tab = document.querySelectorAll<HTMLElement>(".day-header");
             for (let i = 0; i < arr.length; i++) {
-                arr[i].style.display = "block";
+                arr[i].style.display = "flex";
                 tab[i].style.display = "block";
             }
         }
@@ -65,11 +83,6 @@
                 (start <= weekBegin && end >= weekEnd)
             );
         }
-        type DayPlan = {
-            top: number;
-            bottom: number;
-            text: string;
-        };
     }
     function generateHours() {
         const hours: string[] = [];
@@ -108,6 +121,11 @@
         "Sobota",
         "Niedziela",
     ];
+    type DayPlan = {
+        top: number;
+        bottom: number;
+        text: string;
+    };
 </script>
 
 <svelte:window bind:innerWidth />
@@ -135,14 +153,19 @@
             {/each}
         </div>
         <div class="week">
-            {#each dayPlans as plan}
+            {#each dayPlans as columns}
                 <div class="day">
-                    {#each plan as { top, bottom, text }}
-                        <div
-                            class="plan"
-                            style="top: {top * 100}%; bottom: {bottom * 100}%"
-                        >
-                            {text}
+                    {#each columns as column}
+                        <div class="column">
+                            {#each column as { top, bottom, text }}
+                                <div
+                                    class="plan"
+                                    style="top: {top * 100}%; bottom: {bottom *
+                                        100}%"
+                                >
+                                    {text}
+                                </div>
+                            {/each}
                         </div>
                     {/each}
                 </div>
@@ -222,12 +245,18 @@
                     margin-left: 0.2vmin;
                     margin-right: 0.2vmin;
                     padding: 2.5vmin;
-                    position: relative;
+                    justify-content: space-between;
+                    align-items: stretch;
 
-                    .plan {
-                        background-color: aqua;
-                        position: absolute;
-                        width: calc(100% - 5vmin);
+                    .column {
+                        flex: 1;
+                        position: relative;
+
+                        .plan {
+                            background-color: aqua;
+                            position: absolute;
+                            width: calc(100% - 5vmin);
+                        }
                     }
                 }
             }
