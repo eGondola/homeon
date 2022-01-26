@@ -22,7 +22,9 @@
             }}
             style="position: fixed; top: 0; left: 0;">Wróć</button
         >
-        <Profile />
+        {#await api.get("groups") then groups}
+            <Profile {groups} />
+        {/await}
     {:else}
         {#await api.get("groups") then groups}
             <Router>

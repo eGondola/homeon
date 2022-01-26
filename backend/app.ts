@@ -54,13 +54,27 @@ async function main() {
             name: req.body.name,
             token,
             plans: [],
-            list: []
+            list: [],
         });
         database.users.updateOne(
             { login: req.session?.user.login },
             { $push: { groups: token } }
         );
         res.send(token);
+    });
+
+    app.post("/api/leave-group", async (req, res) => {
+        await database.users.updateOne(
+            { login: req.session?.user.login },
+            { $pull: { groups: req.body.token } }
+        );
+        const user = await database.users.findOne({
+            groups: req.body.token,
+        });
+        if (!user) {
+            await database.groups.deleteOne({ token: req.body.token });
+        }
+        res.send();
     });
 
     app.get("/api/groups", async (req, res) => {
@@ -94,17 +108,20 @@ async function main() {
 
     app.post("/shopping-list", async (req, res) => {
         //let list = await database.list.find({}).toArray();
-        let group = await database.groups.findOne({token: req.body.token});
+        let group = await database.groups.findOne({ token: req.body.token });
         res.send(group?.list);
     });
 
     app.post("/updateList", (req, res) => {
         //error
         //database.list.drop();
-        let [list, group] = JSON.parse(req.body)
+        let [list, group] = JSON.parse(req.body);
         if (JSON.parse(req.body).length > 0)
-            database.groups.updateOne({token: group.token}, {$set: {list: list}})
-            //database.list.insertMany(JSON.parse(req.body));
+            database.groups.updateOne(
+                { token: group.token },
+                { $set: { list: list } }
+            );
+        //database.list.insertMany(JSON.parse(req.body));
     });
 
     /*app.post("/addToList", async (req, res) => {
@@ -143,7 +160,7 @@ async function main() {
                 name: "Osobiste",
                 token: personalGroupToken,
                 plans: [],
-                list: []
+                list: [],
             }),
         ]);
 
