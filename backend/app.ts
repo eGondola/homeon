@@ -92,6 +92,7 @@ async function main() {
             { token: req.body.token },
             { $push: { plans: req.body.plan } }
         );
+        res.send();
     });
 
     app.get("/group/:token", (req, res) => {
@@ -122,6 +123,7 @@ async function main() {
                 { $set: { list: list } }
             );
         //database.list.insertMany(JSON.parse(req.body));
+        res.send();
     });
 
     app.post("/api/remove-plan", async (req, res) => {
