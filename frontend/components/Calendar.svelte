@@ -9,9 +9,9 @@
     showPlan = false
     export let date: Date;
 
-    const group = getContext<any>("group");
+    const group = getContext<Writable<any>>("group");
 
-    let plans: Plans = $group.plans.map(({ start, end, text }: any) => ({
+    $: plans = $group.plans.map(({ start, end, text }: any) => ({
         start: new Date(start),
         end: new Date(end),
         text,
@@ -167,7 +167,7 @@
     ];
 
     function PlanClick(text: string) {
-        plans.forEach((plan) => {
+        plans.forEach((plan: Plan) => {
             if (plan.text == text) {
                 showPlan = plan;
             }
