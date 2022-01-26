@@ -4,11 +4,27 @@ import { getDatabase } from "./database";
 import bcrypt from "bcryptjs";
 import { nanoid } from "nanoid";
 import cookieSession from "cookie-session";
+import http from "http";
+import { Server } from "socket.io";
 
 main();
 
 async function main() {
     const app = express();
+    const server = http.createServer(app);
+    const io = new Server(server);
+    io.on("connection", socket => {
+        socket.on("newGroup", newGroup => {
+            socket.rooms.forEach(room => {
+                socket.leave(room);
+            })
+            socket.join(newGroup.token);
+        })
+    })
+    async function UpdateRooms(token: string)
+    {
+        io.to(token).emit("Group", await database.groups.findOne({token}))
+    }
     app.use(express.static("frontend/public"));
     app.use(express.text());
     app.use(express.json());
@@ -127,14 +143,15 @@ async function main() {
     });
 
     app.post("/api/remove-plan", async (req, res) => {
-        let group = await database.groups.findOne({name: req.body[0]});
+        let group = await database.groups.findOne({token: req.body[0]});
         let plans = group?.plans;
         let newPlans:any = [];
         plans?.forEach(plan => {
             if(plan.text != req.body[1].text)
                 newPlans.push(plan)
         })
-        database.groups.updateOne({name: req.body[0]}, {$set: {plans: newPlans}})
+        database.groups.updateOne({token: req.body[0]}, {$set: {plans: newPlans}})
+        UpdateRooms(req.body[0])
         res.send();
     })
 
@@ -150,7 +167,7 @@ async function main() {
         database.list.insertOne(obj);
     });*/
 
-    app.listen(process.env.PORT || 3000);
+    server.listen(process.env.PORT || 3000);
 
     async function register(req: any) {
         const email = await database.users.findOne({ email: req.body.email });

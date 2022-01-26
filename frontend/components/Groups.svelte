@@ -1,15 +1,12 @@
 <script type="ts">
-    import { setContext } from "svelte";
-    import { writable } from "svelte/store";
-    import * as api from "../util/api";
+    import { getContext } from "svelte";
 
     export let groups: any;
     export let showGroups: any;
     // let name: string;
 
-    const currentGroup = writable(groups[0]);
-    setContext("group", currentGroup);
-
+    const currentGroup = getContext("group");
+    
     
     // async function addGroup() {
     //     const token = await api.post("add-group", {
@@ -56,7 +53,6 @@
     </div>
 </div>
 {/if}
-<slot />
 
 <style lang="scss">
     @import "../styles/variables.scss";

@@ -296,14 +296,16 @@
                     Accept: "application/json",
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify([$group.name, showPlan])
+                body: JSON.stringify([$group.token, showPlan])
             });
             /*plans.splice(plans.indexOf(showPlan), 1); plans = plans;*/
             showPlan = false;
             }}><i class="icon-delete"></i></div>
 
             <DateText date={showPlan.start} />
+            {showPlan.start.getHours()}:{showPlan.start.getMinutes()} - 
             <DateText date={showPlan.end} />
+            {showPlan.end.getHours()}:{showPlan.end.getMinutes()}<br>
             {showPlan.text}
         </div>
         <!-- <form

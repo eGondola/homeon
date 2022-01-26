@@ -3,6 +3,7 @@ import resolve from "@rollup/plugin-node-resolve";
 import css from "rollup-plugin-import-css";
 import sveltePreprocess from "svelte-preprocess";
 import typescript from "@rollup/plugin-typescript";
+import commonjs from "@rollup/plugin-commonjs";
 
 export default {
     input: "frontend/index.ts",
@@ -17,5 +18,8 @@ export default {
         resolve({ browser: true }),
         typescript(),
         css(),
+        commonjs({
+            transformMixedEsModules: true,
+        }),
     ],
 };
