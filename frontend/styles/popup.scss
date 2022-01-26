@@ -75,6 +75,12 @@
         margin-bottom: 8vmin;
         text-align: center;
 
+        #delete_plan {
+            font-size: 10vmin;
+            margin-bottom: 5vmin;
+            color: $s-color-dark;
+        }
+
         input {
             border: none;
             width: 100%;

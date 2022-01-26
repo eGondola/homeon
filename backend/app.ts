@@ -124,6 +124,18 @@ async function main() {
         //database.list.insertMany(JSON.parse(req.body));
     });
 
+    app.post("/api/remove-plan", async (req, res) => {
+        let group = await database.groups.findOne({name: req.body[0]});
+        let plans = group?.plans;
+        let newPlans:any = [];
+        plans?.forEach(plan => {
+            if(plan.text != req.body[1].text)
+                newPlans.push(plan)
+        })
+        database.groups.updateOne({name: req.body[0]}, {$set: {plans: newPlans}})
+        res.send();
+    })
+
     /*app.post("/addToList", async (req, res) => {
         let last: any = await database.list
             .find({})

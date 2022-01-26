@@ -59,6 +59,12 @@
       "css": "share",
       "code": 61920,
       "src": "fontawesome"
+    },
+    {
+      "uid": "f48ae54adfb27d8ada53d0fd9e34ee10",
+      "css": "delete",
+      "code": 59400,
+      "src": "fontawesome"
     }
   ]
 }

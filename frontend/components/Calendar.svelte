@@ -5,7 +5,8 @@
     import * as api from "../util/api";
     import { addDays } from "../util/date";
 
-    export let showPlan: Writable<Plan | false>;
+    let showPlan: Plan | false;
+    showPlan = false
     export let date: Date;
 
     const group = getContext<any>("group");
@@ -168,8 +169,7 @@
     function PlanClick(text: string) {
         plans.forEach((plan) => {
             if (plan.text == text) {
-                showPlan.set(plan);
-                console.log(plan);
+                showPlan = plan;
             }
         });
     }
@@ -250,6 +250,93 @@
         </div>
     </div>
 </div>
+<!-- {#if showPlan}
+<div class="PlanDescription">
+    <DateText date={showPlan.start} /><br>
+    <DateText date={showPlan.end} /><br>
+    {showPlan.text}
+    <button on:click={async () => {
+            const rawResponse = await fetch("/api/remove-plan", {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify([$group.name, showPlan])
+        });/*
+        plans.splice(plans.indexOf(showPlan), 1);  
+        console.log(plans)
+        plans = plans;*/
+        showPlan = false;
+    }}>X</button>
+    <button on:click={() => {showPlan = false}}>cofnij</button>
+</div>
+{/if} -->
+
+{#if showPlan}
+<div class="popup">
+    <!-- <DateText date={$showPlan.start} /><br>
+    <DateText date={$showPlan.end} /><br>
+    {$showPlan.text}
+    <button on:click={() => {showPlan.set(false)}}>cofnij</button> -->
+
+    <div>
+        <div class="exit_save">
+            <div class="popup_exit">
+                <button type="button" on:click={() => {
+                    showPlan = false
+                }}><i class="icon-x" /></button>
+            </div>
+        </div>
+        <div class="popup_date">
+            <div id="delete_plan" on:click={async () => {
+                await fetch("/api/remove-plan", {
+                method: "POST",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify([$group.name, showPlan])
+            });
+            /*plans.splice(plans.indexOf(showPlan), 1); plans = plans;*/
+            showPlan = false;
+            }}><i class="icon-delete"></i></div>
+
+            <DateText date={showPlan.start} />
+            <DateText date={showPlan.end} />
+            {showPlan.text}
+        </div>
+        <!-- <form
+            on:submit|preventDefault={() => {
+                api.post("add-plan", {
+                    token: $group.token,
+                    plan: {
+                        start,
+                        end,
+                        text,
+                    },
+                });
+                plans = [
+                    ...plans,
+                    {
+                        start: new Date(start),
+                        end: new Date(end),
+                        text,
+                    },
+                ];
+            }}
+        >
+            <div class="popup_date">
+                <input type="datetime-local" bind:value={start} />
+                <input type="datetime-local" bind:value={end} />
+            </div>
+            <div class="popup_title">
+                <input type="text" bind:value={text} />
+            </div>
+        </form> -->
+    </div>
+</div>
+{/if}
 <div class="popup popup_add" class:shown={popupShown}>
     <div>
         <form

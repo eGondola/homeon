@@ -44,62 +44,10 @@
     </div>
 </div>
 
-<Calendar {date} {showPlan}/> 
-{#if $showPlan}
-<div class="popup">
-    <!-- <DateText date={$showPlan.start} /><br>
-    <DateText date={$showPlan.end} /><br>
-    {$showPlan.text}
-    <button on:click={() => {showPlan.set(false)}}>cofnij</button> -->
-
-    <div>
-        <div class="exit_save">
-            <div class="popup_exit">
-                <button type="button" on:click={() => {
-                    showPlan.set(false)
-                }}><i class="icon-x" /></button>
-            </div>
-        </div>
-        <div class="popup_date">
-            <DateText date={$showPlan.start} />
-            <DateText date={$showPlan.end} />
-            {$showPlan.text}
-        </div>
-        <!-- <form
-            on:submit|preventDefault={() => {
-                api.post("add-plan", {
-                    token: $group.token,
-                    plan: {
-                        start,
-                        end,
-                        text,
-                    },
-                });
-                plans = [
-                    ...plans,
-                    {
-                        start: new Date(start),
-                        end: new Date(end),
-                        text,
-                    },
-                ];
-            }}
-        >
-            <div class="popup_date">
-                <input type="datetime-local" bind:value={start} />
-                <input type="datetime-local" bind:value={end} />
-            </div>
-            <div class="popup_title">
-                <input type="text" bind:value={text} />
-            </div>
-        </form> -->
-    </div>
-</div>
-{/if}
+<Calendar {date} /> 
 
 <style lang="scss">
     @import "../styles/variables.scss";
-    @import "../styles/popup.scss";
     
     #arrows {
         display: flex;

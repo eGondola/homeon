@@ -5,53 +5,38 @@
 
     export let groups: any;
     export let showGroups: any;
-    let name: string;
+    // let name: string;
 
     const currentGroup = writable(groups[0]);
     setContext("group", currentGroup);
 
     
-    async function addGroup() {
-        const token = await api.post("add-group", {
-            name,
-        });
+    // async function addGroup() {
+    //     const token = await api.post("add-group", {
+    //         name,
+    //     });
  
-        groups = [
-            ...groups,
-            {
-                name,
-                token,
-            },
-        ];
+    //     groups = [
+    //         ...groups,
+    //         {
+    //             name,
+    //             token,
+    //         },
+    //     ];
 
-        groupSwitch = !groupSwitch;
-    }
+    //     //groupSwitch = !groupSwitch;
+    // }
     
-    let groupSwitch = true;
+    // let groupSwitch = true;
 
-    function addGroupButton() {
-        groupSwitch = !groupSwitch;
-    }
+    // function addGroupButton() {
+    //     groupSwitch = !groupSwitch;
+    // }
 </script>
 {#if showGroups}
 <div id="top">
     <div id="groups">
-        <div>
-            <form
-                on:submit|preventDefault={() => {addGroup()}}
-            >
-                <span on:click={() => {addGroupButton()}}><i class={groupSwitch ? 'icon-plus' : 'icon-x'} /></span>
-                {#if !groupSwitch}
-                <span id="add_group_form">
-                    <input type="text" bind:value={name} />
-                    <button type="submit">Dodaj grupę</button>
-                </span>
-                {/if}
-                
-                
-            </form>
-        </div>
-        {#if groupSwitch}
+        <!-- {#if groupSwitch} -->
             {#each groups as group}
                 <div>
                     <span
@@ -67,7 +52,7 @@
                     disabled
                 /> -->
             {/each}
-        {/if}
+        <!-- {/if} -->
     </div>
 </div>
 {/if}
@@ -97,60 +82,60 @@
            > div {
                 display: inline;
 
-                > form {
-                    display: inline;
+                // > form {
+                //     display: inline;
 
-                    > span {
+                //     > span {
 
-                        &:nth-child(1) {
-                            background-color: $s-color-light;
-                        }
-                    }
+                //         &:nth-child(1) {
+                //             background-color: $s-color-light;
+                //         }
+                //     }
 
-                    #add_group_form {
-                        position: relative;
+                //     #add_group_form {
+                //         position: relative;
                         
-                        input {
-                            width: 37vmin;
-                            margin-right: 28vmin;
+                //         input {
+                //             width: 37vmin;
+                //             margin-right: 28vmin;
 
-                            border: none;
-                            border-bottom: 1px solid $p-color-dark;
+                //             border: none;
+                //             border-bottom: 1px solid $p-color-dark;
 
-                            background-color: unset;
-                            color: white;
-                            text-transform: lowercase;
-                            font-variant: small-caps;
-                        }
+                //             background-color: unset;
+                //             color: white;
+                //             text-transform: lowercase;
+                //             font-variant: small-caps;
+                //         }
 
-                        input:focus {
-                            outline:none;
-                        }
+                //         input:focus {
+                //             outline:none;
+                //         }
 
-                        button {
-                            height: 100%;
+                //         button {
+                //             height: 100%;
 
-                            position: absolute;
-                            top: 0;
-                            right: 0;
+                //             position: absolute;
+                //             top: 0;
+                //             right: 0;
 
-                            border: none;
-                            border-radius: 0vmin 10vmin 10vmin 0vmin;
+                //             border: none;
+                //             border-radius: 0vmin 10vmin 10vmin 0vmin;
 
-                            padding-right: 4vmin;
-                            padding-left: 4vmin;
+                //             padding-right: 4vmin;
+                //             padding-left: 4vmin;
 
-                            background-color: unset;
-                            border-left: 3px double $p-color-light;
+                //             background-color: unset;
+                //             border-left: 3px double $p-color-light;
                             
-                            color: white;
-                            text-transform: lowercase;
-                            font-variant: small-caps;
-                        }
-                    }
-                }
+                //             color: white;
+                //             text-transform: lowercase;
+                //             font-variant: small-caps;
+                //         }
+                //     }
+                // }
 
-                > form > span, > span {
+                > span {
                     padding: 2vmin 5vmin;
                     margin: 1vmin;
                     border-radius: 10vmin;
@@ -159,11 +144,11 @@
                     box-shadow: -0.5vmin -0.5vmin 1vmin 0vmin #00000040, 0.5vmin 0.5vmin 1vmin 0vmin #00000040;
                 }
 
-                > form > span {
-                    &:nth-child(1) {
-                        padding: 2vmin;
-                    }
-                }
+                // > form > span {
+                //     &:nth-child(1) {
+                //         padding: 2vmin;
+                //     }
+                // }
 
                 .active {
                     background-color: $p-color-light;
