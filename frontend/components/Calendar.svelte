@@ -250,7 +250,7 @@
         </div>
     </div>
 </div>
-<div class="popup" class:shown={popupShown}>
+<div class="popup popup_add" class:shown={popupShown}>
     <div>
         <div class="exit_save">
             <div class="popup_exit">
@@ -295,106 +295,7 @@
 
 <style lang="scss">
     @import "../styles/variables.scss";
-
-    .popup {
-        display: none;
-        position: fixed;
-        
-        height: 217vmin;
-
-        @media (min-width: 800px) {
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-
-            height: 60%;
-            width: 80%;
-        }
-
-        padding: 5vmin;
-
-        &.shown {
-            display: flex;
-        }
-        flex-flow: column;
-
-        background-color: white;
-
-        .exit_save {
-            display: flex;
-            flex-flow: row;
-
-            margin-bottom: 10vmin;
-
-            > div {
-                flex: 1;
-                display: flex;
-                align-items: center;
-            }
-
-            .popup_exit {
-                button {
-                    border-radius: 10vmin;
-                    
-                    text-transform: lowercase;
-                    font-variant: small-caps;
-                    font-size: 7vmin;
-
-                    border: none;
-                    background-color: white;
-                    color: $p-color;
-                }
-            }
-
-            .popup_save {
-                justify-content: right;
-
-                button {
-                    border-radius: 10vmin;
-
-                    width: 20vmin;
-                    height: 100%;
-                    
-                    text-transform: lowercase;
-                    font-variant: small-caps;
-
-                    border: none;
-                    background-color: $p-color;
-                    color: white;
-                }
-            }
-        }
-
-        .popup_date {
-            margin-bottom: 8vmin;
-
-            input {
-                border: none;
-                width: 100%;
-                font-size: 7vmin;
-                color: $s-color;
-            }
-        }
-
-        .popup_title {
-            input {
-                width: 100%;
-                border: 1px solid $p-color;
-                border-radius: 2vmin;
-                font-size: 5vmin;
-                padding-left: 1vmin;
-                padding-right: 1vmin;
-            }
-
-            input:focus {
-                outline: 1px solid $p-color;
-            }
-        }
-
-        .popup_exit {
-            text-align: center;
-        }
-    }
+    @import "../styles/popup.scss";
 
     .calendar {
         font-size: 5vmin;
