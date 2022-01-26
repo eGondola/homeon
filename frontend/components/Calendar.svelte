@@ -18,8 +18,8 @@
 
     let popupShown = false;
     let innerWidth: number;
-    let start = Date.now();
-    let end = Date.now();
+    let start = new Date().toISOString().slice(0, 16)
+    let end = new Date(new Date(date).setHours(date.getHours() + 1)).toISOString().slice(0, 16)
     let text = "";
 
     $: monday = getMonday(date);
@@ -250,50 +250,52 @@
         </div>
     </div>
 </div>
-<div class="popup" class:shown={popupShown}>
-    <form
-        on:submit|preventDefault={() => {
-            api.post("add-plan", {
-                token: $group.token,
-                plan: {
-                    start,
-                    end,
-                    text,
-                },
-            });
-            plans = [
-                ...plans,
-                {
-                    start: new Date(start),
-                    end: new Date(end),
-                    text,
-                },
-            ];
-        }}
-    >
-        <input type="datetime-local" bind:value={start} />
-        <input type="datetime-local" bind:value={end} />
-        <input type="text" bind:value={text} />
-        <button type="submit">Dodaj plan</button>
-    </form>
-    <button
-        type="button"
-        on:click={() => {
-            popupShown = false;
-        }}>X</button
-    >
+<div class="popup popup_add" class:shown={popupShown}>
+    <div>
+        <div class="exit_save">
+            <div class="popup_exit">
+                <button type="button" on:click={() => {
+                    popupShown = false;
+                }}><i class="icon-x" /></button>
+            </div>
+            <div class="popup_save">
+                <button type="submit">Zapisz</button>
+            </div>
+        </div>
+        <form
+            on:submit|preventDefault={() => {
+                api.post("add-plan", {
+                    token: $group.token,
+                    plan: {
+                        start,
+                        end,
+                        text,
+                    },
+                });
+                plans = [
+                    ...plans,
+                    {
+                        start: new Date(start),
+                        end: new Date(end),
+                        text,
+                    },
+                ];
+            }}
+        >
+            <div class="popup_date">
+                <input type="datetime-local" bind:value={start} />
+                <input type="datetime-local" bind:value={end} />
+            </div>
+            <div class="popup_title">
+                <input type="text" bind:value={text} />
+            </div>
+        </form>
+    </div>
 </div>
 
 <style lang="scss">
     @import "../styles/variables.scss";
-
-    .popup {
-        display: none;
-
-        &.shown {
-            display: block;
-        }
-    }
+    @import "../styles/popup.scss";
 
     .calendar {
         font-size: 5vmin;
