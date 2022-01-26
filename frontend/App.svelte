@@ -16,15 +16,36 @@
     {#if !user.login}
         <Authorization />
     {:else if editProfile}
-        <button
-            on:click={() => {
-                editProfile = !editProfile;
-            }}
-            style="position: fixed; top: 0; left: 0;">Wróć</button
-        >
-        {#await api.get("groups") then groups}
-            <Profile {groups} />
-        {/await}
+        <div id="profile_menage">
+            <div id="profile_icon">
+                <div>
+                    <div>
+                        <span
+                        on:click={() => {
+                            editProfile = !editProfile;
+                        }}><i class="icon-home" /></span
+                        >
+                    </div>
+                </div>
+                <div>
+                    <div>
+                        <i class="icon-profile" />
+                    </div>
+                    <span>moj_login</span>
+                </div>
+                <div>
+                    <div
+                        on:click={async () => {
+                            await fetch("/logout");
+                            location.replace("/");
+                        }}><i class="icon-logout" /></div
+                    >
+                </div>
+            </div>
+            {#await api.get("groups") then groups}
+                <Profile {groups} />
+            {/await}
+        </div>
     {:else}
         {#await api.get("groups") then groups}
             <Router>
@@ -126,6 +147,102 @@
 
     :global(*, ::before, ::after) {
         box-sizing: border-box;
+    }
+
+    #profile_menage {
+        height: 100%;
+        display: flex;
+        flex-flow: column;
+
+        #profile_icon {
+            height: 50vmin;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            > div {
+                flex: 1;
+
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                i {
+                    color: white;
+                }
+
+                > div {
+                    border: 2px solid $s-color-light;
+
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                &:nth-child(1) {
+                    > div {
+                        height: 15vmin;
+                        width: 15vmin;
+                        font-size: 6vmin;
+                        border-radius: 50%;
+                        background-color: $p-color-dark;
+                    }
+                }
+
+                &:nth-child(2) {
+                    display: flex;
+                    flex-flow: column;
+
+                    > div {
+                        height: 30vmin;
+                        width: 30vmin;
+                        font-size: 10vmin;
+                        border-radius: 50%;
+
+                        margin-bottom: 4vmin;
+
+                        i {
+                            color: $s-color;
+                        }
+                    }
+
+                    > span {
+                        font-size: 6vmin;
+                        color: $p-color-dark;
+                    }
+                }
+
+                &:nth-child(3) {
+                    > div {
+                        height: 15vmin;
+                        width: 15vmin;
+                        font-size: 6vmin;
+                        border-radius: 50%;
+                        background-color: $s-color-dark;
+                    }
+                }
+
+
+
+                // #logout {
+                //     display: flex;
+                //     align-items: center;
+                //     justify-content: center;
+
+                //     span {
+                //         padding: 2vmin 5vmin;
+                //         margin: 1vmin;
+                //         border-radius: 10vmin;
+                //         box-shadow: -0.5vmin -0.5vmin 1vmin 0vmin #00000040, 0.5vmin 0.5vmin 1vmin 0vmin #00000040;
+                        
+                //         background-color: $s-color-dark;
+                //         color: white;
+                //         text-transform: lowercase;
+                //         font-variant: small-caps;
+                //     }
+                // }
+            }
+        }
     }
 
     .home {
