@@ -252,16 +252,6 @@
 </div>
 <div class="popup popup_add" class:shown={popupShown}>
     <div>
-        <div class="exit_save">
-            <div class="popup_exit">
-                <button type="button" on:click={() => {
-                    popupShown = false;
-                }}><i class="icon-x" /></button>
-            </div>
-            <div class="popup_save">
-                <button type="submit">Zapisz</button>
-            </div>
-        </div>
         <form
             on:submit|preventDefault={() => {
                 api.post("add-plan", {
@@ -280,8 +270,21 @@
                         text,
                     },
                 ];
+
+                popupShown = false
             }}
         >
+            <div class="exit_save">
+                <div class="popup_exit">
+                    <button type="button" on:click={() => {
+                        popupShown = false;
+                    }}><i class="icon-x" /></button>
+                </div>
+                <div class="popup_save">
+                    <button type="submit">Zapisz</button>
+                </div>
+            </div>
+
             <div class="popup_date">
                 <input type="datetime-local" bind:value={start} />
                 <input type="datetime-local" bind:value={end} />
@@ -289,6 +292,7 @@
             <div class="popup_title">
                 <input type="text" bind:value={text} />
             </div>
+            
         </form>
     </div>
 </div>
