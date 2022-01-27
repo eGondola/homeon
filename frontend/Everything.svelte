@@ -6,7 +6,6 @@
     import Groups from "./components/Groups.svelte";
     import { setContext } from "svelte";
     import { writable } from "svelte/store";
-import { group } from "console";
 
     export let groups: any[];
     var socket = io();
