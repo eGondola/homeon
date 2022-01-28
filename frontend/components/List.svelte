@@ -38,7 +38,7 @@
         });
         updateList(list);
     }
-    function updateList(list: Item[]) {
+    function updateList(list: ListElement[]) {
         fetch("/updateList", {
             method: "POST",
             body: JSON.stringify([list, $currentGroup]),

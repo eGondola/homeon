@@ -14,7 +14,7 @@
     $: plans = $group.plans.map(({ start, end, text }: any) => ({
         start: new Date(start),
         end: new Date(end),
-        text,
+        text
     }));
 
     let popupShown = false;

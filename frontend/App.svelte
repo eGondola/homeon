@@ -1,4 +1,5 @@
 <script type="ts">
+    import Everything from "./Everything.svelte"
     import { Router, link, Route } from "svelte-routing";
     import Authorization from "./components/Authorization.svelte";
     import List from "./components/list.svelte";
@@ -155,7 +156,7 @@
         }
     }
 
-    .home {
+    /*.home {
         height: 100%;
         display: flex;
         flex-flow: column;
@@ -306,5 +307,5 @@
                 }
             }
         }
-    }
+    }*/
 </style>

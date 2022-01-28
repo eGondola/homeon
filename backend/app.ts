@@ -18,7 +18,7 @@ async function main() {
             socket.rooms.forEach(room => {
                 socket.leave(room);
             })
-            socket.join(newGroup.token);
+            socket.join(newGroup?.token);
         })
     })
     async function UpdateRooms(token: string)
