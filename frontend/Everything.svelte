@@ -13,7 +13,7 @@
     setContext("group", currentGroup);
 
     socket.on("Group", (group:any) => {
-        currentGroup.set(group) 
+        currentGroup.set(group);
     })
 
     currentGroup.subscribe(newGroup => {

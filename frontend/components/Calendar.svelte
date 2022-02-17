@@ -10,13 +10,12 @@
     export let date: Date;
 
     const group = getContext<Writable<any>>("group");
-
+    
     $: plans = $group.plans.map(({ start, end, text }: any) => ({
         start: new Date(start),
         end: new Date(end),
         text
     }));
-
     let popupShown = false;
     let innerWidth: number;
     let start = new Date().toISOString().slice(0, 16)

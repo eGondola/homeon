@@ -25,6 +25,10 @@ async function main() {
     {
         io.to(token).emit("Group", await database.groups.findOne({token}))
     }
+    /*async function GetList(token: string)
+    {
+        io.to(token).emit("List", )        
+    }*/
     app.use(express.static("frontend/public"));
     app.use(express.text());
     app.use(express.json());
@@ -129,16 +133,18 @@ async function main() {
         res.send(group?.list);
     });
 
-    app.post("/updateList", (req, res) => {
+    app.post("/updateList", async (req, res) => {
         //error
         //database.list.drop();
         let [list, group] = JSON.parse(req.body);
         if (JSON.parse(req.body).length > 0)
-            database.groups.updateOne(
+            await database.groups.updateOne(
                 { token: group.token },
                 { $set: { list: list } }
             );
+        UpdateRooms(group.token);
         //database.list.insertMany(JSON.parse(req.body));
+
         res.send();
     });
 

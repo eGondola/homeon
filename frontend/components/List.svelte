@@ -1,73 +1,46 @@
 <script type="ts">
     import { getContext, onMount } from "svelte";
+    import type { Writable } from "svelte/store";
 
-    interface ListElement {
-        id: number;
-        count: number;
-        text: string;
-    }
-
-    let list: ListElement[] = [];
+    const group = getContext<Writable<any>>("group");
     let text: string;
     let count: number;
     let message: string = "";
 
     const currentGroup = getContext<any>("group");
-    
-    onMount(async () => {
-        GetList()
-    });
-
-    $: $currentGroup, GetList()
-
-    async function GetList() {
-        const rawResponse = await fetch("/shopping-list", {
-            method: "POST",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify($currentGroup)
-        });
-        list = await rawResponse.json();
-    }
 
     function deleteItem(id: number) {
-        list = list.filter((item) => {
+        $group.list = $group.list.filter((item: any) => {
             return item.id != id;
         });
-        updateList(list);
+        updateList();
     }
-    function updateList(list: ListElement[]) {
+    function updateList() {
         fetch("/updateList", {
             method: "POST",
-            body: JSON.stringify([list, $currentGroup]),
+            body: JSON.stringify([$group.list, $currentGroup]),
         });
     }
 
     function sendForm() {
         if (text.trim().length > 2 && count > 0) {
             let max = 0;
-            for (let i = 0; i < list.length; i++)
-                if (max < list[i].id) max = list[i].id;
+            for (let i = 0; i < $group.list.length; i++)
+                if (max < $group.list[i].id) max = $group.list[i].id;
             max++;
-            list.push({ text: text, count: count, id: max });
-            list = list;
-            updateList(list)
-            /*fetch("/addToList", {
-                method: "POST",
-                body: JSON.stringify({ text: text, count: count }),
-            });*/
+            $group.list.push({ text: text, count: count, id: max });
+            $group.list = $group.list;
+            updateList()
             text = "";
             count = 0;
             message = "";
         } else {
-            message = "Kurwa co ty robisz pecie pierdolony";
+            message = "Podaj dłuższą nazwe lub ilość większą od zera!";
         }
     }
 </script>
 
-{#each list as item}
+{#each $group.list as item}
     <div class="card">
         <div class="num-display">
             {item.count}
