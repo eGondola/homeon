@@ -1,11 +1,12 @@
 <script type="ts">
     import { getContext } from "svelte";
+    import type { Writable } from "svelte/store";
 
     export let groups: any;
     export let showGroups: any;
     // let name: string;
 
-    const currentGroup = getContext("group");
+    const currentGroup = getContext<Writable<any>>("group");
     
     
     // async function addGroup() {
@@ -153,7 +154,7 @@
         }
     }
 
-    #arrows {
+    /*#arrows {
         display: flex;
         flex-flow: row;
 
@@ -193,5 +194,5 @@
                 color: white;
             }
         }
-    }
+    }*/
 </style>

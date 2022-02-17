@@ -19,7 +19,6 @@
     currentGroup.subscribe(newGroup => {
         socket.emit("newGroup", newGroup)
     })
-
     let showGroups = true;
     let editProfile = false;
     //const io = require("socket.io-client");

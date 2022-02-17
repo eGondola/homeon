@@ -1,9 +1,6 @@
 <script type="ts">
     import * as api from "../util/api";
-
     export let groups: any[];
-
-
     let name: string;
     async function addGroup() {
         const token = await api.post("add-group", {
@@ -16,8 +13,8 @@
                 name,
                 token,
             },
-        ];
-
+        ];   
+        
         //groupSwitch = !groupSwitch;
     }
 </script>
