@@ -1,8 +1,9 @@
 <script type="ts">
+    import type { Writable } from "svelte/store";
     import type { Group } from "../../common/types";
     import * as api from "../util/api";
 
-    export let groups: Group[];
+    export let groupsStore: Writable<Group[]>;
 
     let name: string;
 
@@ -11,7 +12,7 @@
             name,
         });
 
-        groups = [
+        groupsStore.update((groups) => [
             ...groups,
             {
                 name,
@@ -19,7 +20,7 @@
                 plans: [],
                 list: [],
             },
-        ];
+        ]);
     }
 </script>
 
@@ -37,7 +38,7 @@
                 </div>
             </form>
         </div>
-        {#each groups as { name, token }, i}
+        {#each $groupsStore as { name, token }, i}
             <div>
                 <div
                     class="delete"
@@ -45,8 +46,10 @@
                         api.post("leave-group", {
                             token,
                         });
-                        groups.splice(i, 1);
-                        groups = groups;
+                        groupsStore.update((groups) => {
+                            groups.splice(i, 1);
+                            return groups;
+                        });
                     }}
                 >
                     <i class="icon-logout" />

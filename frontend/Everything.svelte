@@ -14,6 +14,8 @@
 
     export let groups: Group[];
 
+    const groupsStore = writable(groups);
+
     const socket = io();
     const currentGroup = writable(groups[0]);
     setContext("group", currentGroup);
@@ -31,13 +33,36 @@
 </script>
 
 {#if editProfile}
-    <button
-        on:click={() => {
-            editProfile = !editProfile;
-        }}
-        style="position: fixed; top: 0; left: 0;">Wróć</button
-    >
-    <Profile {groups} />
+    <div id="profile_menage">
+        <div id="profile_icon">
+            <div>
+                <div>
+                    <span
+                        on:click={() => {
+                            editProfile = !editProfile;
+                        }}><i class="icon-home" /></span
+                    >
+                </div>
+            </div>
+            <div>
+                <div>
+                    <i class="icon-profile" />
+                </div>
+                <span>moj_login</span>
+            </div>
+            <div>
+                <div
+                    on:click={async () => {
+                        await fetch("/logout");
+                        location.replace("/");
+                    }}
+                >
+                    <i class="icon-logout" />
+                </div>
+            </div>
+        </div>
+        <Profile {groupsStore} />
+    </div>
 {:else}
     <Router>
         <div class="home">
@@ -63,7 +88,7 @@
                 </div>
             </div>
             {#if showGroups}
-                <Groups {groups} />
+                <Groups groups={$groupsStore} />
             {/if}
             <Route path="/">
                 <div class="info-block">
@@ -124,6 +149,82 @@
 
 <style lang="scss">
     @import "./styles/variables.scss";
+
+    #profile_menage {
+        height: 100%;
+        display: flex;
+        flex-flow: column;
+
+        #profile_icon {
+            height: 50vmin;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            > div {
+                flex: 1;
+
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                i {
+                    color: white;
+                }
+
+                > div {
+                    border: 2px solid $s-color-light;
+
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                &:nth-child(1) {
+                    > div {
+                        height: 15vmin;
+                        width: 15vmin;
+                        font-size: 6vmin;
+                        border-radius: 50%;
+                        background-color: $p-color-dark;
+                    }
+                }
+
+                &:nth-child(2) {
+                    display: flex;
+                    flex-flow: column;
+
+                    > div {
+                        height: 30vmin;
+                        width: 30vmin;
+                        font-size: 10vmin;
+                        border-radius: 50%;
+
+                        margin-bottom: 4vmin;
+
+                        i {
+                            color: $s-color;
+                        }
+                    }
+
+                    > span {
+                        font-size: 6vmin;
+                        color: $p-color-dark;
+                    }
+                }
+
+                &:nth-child(3) {
+                    > div {
+                        height: 15vmin;
+                        width: 15vmin;
+                        font-size: 6vmin;
+                        border-radius: 50%;
+                        background-color: $s-color-dark;
+                    }
+                }
+            }
+        }
+    }
 
     .home {
         height: 100%;
