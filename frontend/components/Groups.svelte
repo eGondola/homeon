@@ -3,11 +3,10 @@
     import type { Writable } from "svelte/store";
 
     export let groups: any;
-    export let showGroups: any;
 
     const currentGroup = getContext<Writable<any>>("group");
 </script>
-{#if showGroups}
+
 <div id="top">
     <div id="groups">
             {#each groups as group}
@@ -22,7 +21,6 @@
             {/each}
     </div>
 </div>
-{/if}
 
 <style lang="scss">
     @import "../styles/variables.scss";

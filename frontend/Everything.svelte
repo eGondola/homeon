@@ -64,7 +64,9 @@
                     <a href="/" use:link><i class="icon-home" /></a>
                 </div>
             </div>
-            <Groups {groups} {showGroups} />
+            {#if showGroups}
+                <Groups {groups} />
+            {/if}
             <Route path="/">
                 <div class="info-block">
                     <div>
