@@ -10,13 +10,15 @@
     import Groups from "./components/Groups.svelte";
     import { setContext } from "svelte";
     import { writable } from "svelte/store";
+    import type { Group } from "../common/types";
 
-    export let groups: any[];
+    export let groups: Group[];
+
     const socket = io();
     const currentGroup = writable(groups[0]);
     setContext("group", currentGroup);
 
-    socket.on("Group", (group: any) => {
+    socket.on("Group", (group) => {
         currentGroup.set(group);
     });
 

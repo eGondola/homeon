@@ -1,5 +1,6 @@
 import { MongoClient } from "mongodb";
 import * as dotenv from "dotenv";
+import type { Group } from "../common/types";
 
 const process = {
     env: {
@@ -19,28 +20,10 @@ export async function getDatabase() {
     };
 }
 
-type ListElement = {
-    text: string;
-    count: number;
-};
-
 type User = {
     login: string;
     password: string;
     email: string;
     confirmEmailToken?: string;
     groups: string[];
-};
-
-type Group = {
-    name: string;
-    token: string;
-    plans: Plan[];
-    list: ListElement[];
-};
-
-type Plan = {
-    start: string;
-    end: string;
-    text: string;
 };

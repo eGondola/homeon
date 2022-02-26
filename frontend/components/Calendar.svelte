@@ -4,22 +4,26 @@
     import DateText from "./DateText.svelte";
     import * as api from "../util/api";
     import { addDays } from "../util/date";
+    import type { Group } from "../../common/types";
 
-    let showPlan: Plan | false;
-    showPlan = false
     export let date: Date;
 
-    const group = getContext<Writable<any>>("group");
-    
-    $: plans = $group.plans.map(({ start, end, text }: any) => ({
+    let showPlan: Plan | false = false;
+
+    const group = getContext<Writable<Group>>("group");
+
+    $: plans = $group.plans.map(({ start, end, text }) => ({
         start: new Date(start),
         end: new Date(end),
-        text
+        text,
     }));
+
     let popupShown = false;
     let innerWidth: number;
-    let start = new Date().toISOString().slice(0, 16)
-    let end = new Date(new Date(date).setHours(date.getHours() + 1)).toISOString().slice(0, 16)
+    let start = new Date().toISOString().slice(0, 16);
+    let end = new Date(new Date(date).setHours(date.getHours() + 1))
+        .toISOString()
+        .slice(0, 16);
     let text = "";
 
     $: monday = getMonday(date);
@@ -249,94 +253,46 @@
         </div>
     </div>
 </div>
-<!-- {#if showPlan}
-<div class="PlanDescription">
-    <DateText date={showPlan.start} /><br>
-    <DateText date={showPlan.end} /><br>
-    {showPlan.text}
-    <button on:click={async () => {
-            const rawResponse = await fetch("/api/remove-plan", {
-            method: "POST",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify([$group.name, showPlan])
-        });/*
-        plans.splice(plans.indexOf(showPlan), 1);  
-        console.log(plans)
-        plans = plans;*/
-        showPlan = false;
-    }}>X</button>
-    <button on:click={() => {showPlan = false}}>cofnij</button>
-</div>
-{/if} -->
 
 {#if showPlan}
-<div class="popup">
-    <!-- <DateText date={$showPlan.start} /><br>
-    <DateText date={$showPlan.end} /><br>
-    {$showPlan.text}
-    <button on:click={() => {showPlan.set(false)}}>cofnij</button> -->
-
-    <div>
-        <div class="exit_save">
-            <div class="popup_exit">
-                <button type="button" on:click={() => {
-                    showPlan = false
-                }}><i class="icon-x" /></button>
+    <div class="popup">
+        <div>
+            <div class="exit_save">
+                <div class="popup_exit">
+                    <button
+                        type="button"
+                        on:click={() => {
+                            showPlan = false;
+                        }}><i class="icon-x" /></button
+                    >
+                </div>
             </div>
-        </div>
-        <div class="popup_date">
-            <div id="delete_plan" on:click={async () => {
-                await fetch("/api/remove-plan", {
-                method: "POST",
-                headers: {
-                    Accept: "application/json",
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify([$group.token, showPlan])
-            });
-            /*plans.splice(plans.indexOf(showPlan), 1); plans = plans;*/
-            showPlan = false;
-            }}><i class="icon-delete"></i></div>
-
-            <DateText date={showPlan.start} />
-            {showPlan.start.getHours()}:{showPlan.start.getMinutes()} - 
-            <DateText date={showPlan.end} />
-            {showPlan.end.getHours()}:{showPlan.end.getMinutes()}<br>
-            {showPlan.text}
-        </div>
-        <!-- <form
-            on:submit|preventDefault={() => {
-                api.post("add-plan", {
-                    token: $group.token,
-                    plan: {
-                        start,
-                        end,
-                        text,
-                    },
-                });
-                plans = [
-                    ...plans,
-                    {
-                        start: new Date(start),
-                        end: new Date(end),
-                        text,
-                    },
-                ];
-            }}
-        >
             <div class="popup_date">
-                <input type="datetime-local" bind:value={start} />
-                <input type="datetime-local" bind:value={end} />
+                <div
+                    id="delete_plan"
+                    on:click={async () => {
+                        await fetch("/api/remove-plan", {
+                            method: "POST",
+                            headers: {
+                                Accept: "application/json",
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify([$group.token, showPlan]),
+                        });
+                        showPlan = false;
+                    }}
+                >
+                    <i class="icon-delete" />
+                </div>
+
+                <DateText date={showPlan.start} />
+                {showPlan.start.getHours()}:{showPlan.start.getMinutes()} -
+                <DateText date={showPlan.end} />
+                {showPlan.end.getHours()}:{showPlan.end.getMinutes()}<br />
+                {showPlan.text}
             </div>
-            <div class="popup_title">
-                <input type="text" bind:value={text} />
-            </div>
-        </form> -->
+        </div>
     </div>
-</div>
 {/if}
 <div class="popup popup_add" class:shown={popupShown}>
     <div>
@@ -359,14 +315,17 @@
                     },
                 ];
 
-                popupShown = false
+                popupShown = false;
             }}
         >
             <div class="exit_save">
                 <div class="popup_exit">
-                    <button type="button" on:click={() => {
-                        popupShown = false;
-                    }}><i class="icon-x" /></button>
+                    <button
+                        type="button"
+                        on:click={() => {
+                            popupShown = false;
+                        }}><i class="icon-x" /></button
+                    >
                 </div>
                 <div class="popup_save">
                     <button type="submit">Zapisz</button>
@@ -380,7 +339,6 @@
             <div class="popup_title">
                 <input type="text" bind:value={text} />
             </div>
-            
         </form>
     </div>
 </div>

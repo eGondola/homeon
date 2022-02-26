@@ -1,17 +1,9 @@
 <script type="ts">
     import Calendar from "../components/Calendar.svelte";
     import { addDays } from "../util/date";
-    import { writable } from "svelte/store";
-    import DateText from "../components/DateText.svelte"
 
     let date = new Date();
     let innerWidth: number;
-    let showPlan = writable<false | Plan>(false);
-    type Plan = {
-        start: Date;
-        end: Date;
-        text: string;
-    };
 </script>
 
 <svelte:window bind:innerWidth />

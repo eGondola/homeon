@@ -1,5 +1,5 @@
 <script type="ts">
-    import { getContext, onMount } from "svelte";
+    import { getContext } from "svelte";
     import type { Writable } from "svelte/store";
 
     const group = getContext<Writable<any>>("group");
@@ -7,7 +7,7 @@
     let count: number;
     let message: string = "";
 
-    const currentGroup = getContext<any>("group");
+    const currentGroup = getContext<Writable<any>>("group");
 
     function deleteItem(id: number) {
         $group.list = $group.list.filter((item: any) => {
@@ -30,7 +30,7 @@
             max++;
             $group.list.push({ text: text, count: count, id: max });
             $group.list = $group.list;
-            updateList()
+            updateList();
             text = "";
             count = 0;
             message = "";
