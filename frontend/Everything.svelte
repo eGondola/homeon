@@ -1,3 +1,7 @@
+<script context="module" type="ts">
+    declare const io: typeof import("socket.io-client").io;
+</script>
+
 <script type="ts">
     import { Router, link, Route } from "svelte-routing";
     import List from "./components/list.svelte";
@@ -8,21 +12,20 @@
     import { writable } from "svelte/store";
 
     export let groups: any[];
-    var socket = io();
+    const socket = io();
     const currentGroup = writable(groups[0]);
     setContext("group", currentGroup);
 
-    socket.on("Group", (group:any) => {
+    socket.on("Group", (group: any) => {
         currentGroup.set(group);
-    })
+    });
 
-    currentGroup.subscribe(newGroup => {
-        socket.emit("newGroup", newGroup)
-    })
+    currentGroup.subscribe((newGroup) => {
+        socket.emit("newGroup", newGroup);
+    });
+
     let showGroups = true;
     let editProfile = false;
-    //const io = require("socket.io-client");
-   
 </script>
 
 {#if editProfile}
@@ -44,13 +47,6 @@
                     }}
                 >
                     <i class="icon-profile" />
-                    <!-- {user.login}
-                                <button
-                                    on:click={async () => {
-                                        await fetch("/logout");
-                                        location.replace("/");
-                                    }}>Wyloguj</button
-                                > -->
                 </div>
                 <div
                     id="show_groups"
