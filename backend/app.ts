@@ -6,6 +6,7 @@ import { nanoid } from "nanoid";
 import cookieSession from "cookie-session";
 import http from "http";
 import { Server } from "socket.io";
+import { send } from "process";
 
 main();
 
@@ -160,6 +161,27 @@ async function main() {
         UpdateRooms(req.body[0])
         res.send();
     })
+
+    // lights
+    app.post("/add-light", async (req, res) => {
+        database.light.updateOne({ name: "check" }, {$set: { check: true }})
+        res.send();
+    });
+
+    app.post("/check-add-light", async (req, res) => {
+        let isset = await database.light.findOne({ name: "check" })
+        res.send(isset?.isset)
+    });
+
+    app.post("/get-lights", async (req, res) => {
+        let lights = await database.light.findOne({ name: "lights" })
+        res.send(lights?.lights);
+    });
+
+    app.post("/edit-lights", async (req, res) => {
+        database.light.updateOne({ name: "lights" }, {$set: { lights: JSON.parse(req.body)}})
+        res.send();
+    });
 
     /*app.post("/addToList", async (req, res) => {
         let last: any = await database.list

@@ -4,6 +4,7 @@
 
 <script type="ts">
     import { Router, link, Route } from "svelte-routing";
+    import HomeManage from "./pages/HomeManage.svelte";
     import List from "./components/list.svelte";
     import CalendarPage from "./pages/CalendarPage.svelte";
     import Profile from "./pages/Profile.svelte";
@@ -126,6 +127,10 @@
                         </div>
                     </div>
                 </div>
+            </Route>
+
+            <Route path="/home-manage">
+                <HomeManage />
             </Route>
 
             <Route path="/plans">
