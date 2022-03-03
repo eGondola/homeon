@@ -2,6 +2,11 @@
     import Everything from "./Everything.svelte";
     import Authorization from "./components/Authorization.svelte";
     import * as api from "./util/api";
+    import { setContext } from "svelte";
+    import { writable } from "svelte/store";
+    let u = writable("");
+    let user = setContext("user", u);
+    api.get("checkLogin").then(res => $u = res)
 </script>
 
 {#await api.get("checkLogin") then user}

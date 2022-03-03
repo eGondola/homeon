@@ -20,10 +20,31 @@ async function main() {
             })
             socket.join(newGroup?.token);
         })
+        socket.on("newPosition", async obj => {
+            await database.users.updateOne({login: obj.user.login, email: obj.user.email}, 
+                {$set: {position: obj.position}})
+            io.to(obj.group.token).emit("position", await GetPositions(obj.group.token));
+        })
+        socket.on("getPositions", async group => {
+            io.to(group.token).emit("position", await GetPositions(group.token));
+        })
     })
-    async function UpdateRooms(token: string)
+    async function GetPositions(token: string)
     {
-        io.to(token).emit("Group", await database.groups.findOne({token}))
+        interface position {
+            x: Number,
+            y: Number
+        }
+        interface pos {
+            login: string,
+            position: position
+        }
+        let users = await database.users.find({groups: token}).toArray();
+        let positions:pos[] = [];
+        users.forEach(user => {
+            positions.push({position: user?.position, login: user?.login});
+        })
+        return positions;
     }
     /*async function GetList(token: string)
     {
@@ -39,6 +60,11 @@ async function main() {
         })
     );
     const database = await getDatabase();
+
+    async function UpdateRooms(token: string)
+    {
+        io.to(token).emit("Group", await database.groups.findOne({token}))
+    }
 
     app.get("/api/checkLogin", (req, res) => {
         res.send(req.session?.user ?? {});
@@ -192,6 +218,7 @@ async function main() {
                 email: req.body.email,
                 confirmEmailToken,
                 groups: [personalGroupToken],
+                position: {x: 0, y: 0}
             }),
             database.groups.insertOne({
                 name: "Osobiste",

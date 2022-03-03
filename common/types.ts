@@ -11,6 +11,19 @@ type Plan = {
     text: string;
 };
 
+export type User = {
+    login: string,
+    email: string
+};
+
+export type position = {
+    login: string,
+    position: {
+        x: number,
+        y: number
+    }
+};
+
 type ListItem = {
     text: string;
     count: number;

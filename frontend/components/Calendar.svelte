@@ -11,7 +11,7 @@
     let showPlan: Plan | false = false;
 
     const group = getContext<Writable<Group>>("group");
-
+        
     $: plans = $group.plans.map(({ start, end, text }) => ({
         start: new Date(start),
         end: new Date(end),

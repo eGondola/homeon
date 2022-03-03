@@ -3,14 +3,16 @@
 </script>
 
 <script type="ts">
+    import type { Writable } from "svelte/store";
     import { Router, link, Route } from "svelte-routing";
     import List from "./components/list.svelte";
     import CalendarPage from "./pages/CalendarPage.svelte";
     import Profile from "./pages/Profile.svelte";
     import Groups from "./components/Groups.svelte";
-    import { setContext } from "svelte";
+    import { setContext, getContext } from "svelte";
     import { writable } from "svelte/store";
-    import type { Group } from "../common/types";
+    import type { Group, User } from "../common/types";
+    import Localization from "./components/Localization.svelte";
 
     export let groups: Group[];
 
@@ -20,16 +22,39 @@
     const currentGroup = writable(groups[0]);
     setContext("group", currentGroup);
 
+    const positions = writable([]);
+    setContext("positions", positions);
+
     socket.on("Group", (group) => {
         currentGroup.set(group);
     });
 
+    socket.on("position", obj => {
+        positions.set(obj);
+        console.log(obj);
+    })
+
     currentGroup.subscribe((newGroup) => {
         socket.emit("newGroup", newGroup);
+        socket.emit("getPositions", newGroup);
     });
 
     let showGroups = true;
     let editProfile = false;
+
+    const user = getContext<Writable<User>>("user");
+
+    navigator.geolocation.watchPosition(
+    pos => {
+        let obj = {
+            user: $user, 
+            position: {x: pos.coords.latitude, y: pos.coords.longitude}, 
+            group: $currentGroup
+        };
+        socket.emit("newPosition", obj)
+    },
+    err => console.log(err)
+    );
 </script>
 
 {#if editProfile}
@@ -134,6 +159,10 @@
 
             <Route path="/shopping-list">
                 <List />
+            </Route>
+            
+            <Route path="/household-duties">
+                <Localization />
             </Route>
 
             <Route path="/confirm/:token">
