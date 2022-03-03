@@ -1,10 +1,6 @@
-.popup_add {
-    display: none;
-}
-
 .popup {
     position: fixed;
-    
+
     height: 100%;
     width: 100%;
 
@@ -18,56 +14,23 @@
     }
 
     padding: 5vmin;
-
-    &.shown {
-        display: flex;
-    }
-    flex-flow: column;
-
     background-color: white;
 
-    .exit_save {
-        display: flex;
-        flex-flow: row;
+    .popup_save {
+        margin-left: auto;
 
-        margin-bottom: 10vmin;
+        button {
+            border-radius: 10vmin;
 
-        > div {
-            flex: 1;
-            display: flex;
-            align-items: center;
-        }
+            width: 20vmin;
+            height: 100%;
 
-        .popup_exit {
-            button {
-                border-radius: 10vmin;
-                
-                text-transform: lowercase;
-                font-variant: small-caps;
-                font-size: 7vmin;
+            text-transform: lowercase;
+            font-variant: small-caps;
 
-                border: none;
-                background-color: white;
-                color: $p-color;
-            }
-        }
-
-        .popup_save {
-            justify-content: right;
-
-            button {
-                border-radius: 10vmin;
-
-                width: 20vmin;
-                height: 100%;
-                
-                text-transform: lowercase;
-                font-variant: small-caps;
-
-                border: none;
-                background-color: $p-color;
-                color: white;
-            }
+            border: none;
+            background-color: $p-color;
+            color: white;
         }
     }
 
@@ -102,9 +65,5 @@
         input:focus {
             outline: 1px solid $p-color;
         }
-    }
-
-    .popup_exit {
-        text-align: center;
     }
 }

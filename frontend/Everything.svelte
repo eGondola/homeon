@@ -5,8 +5,9 @@
 <script type="ts">
     import type { Writable } from "svelte/store";
     import { Router, link, Route } from "svelte-routing";
+    import HomeManage from "./pages/HomeManage.svelte";
     import List from "./components/list.svelte";
-    import CalendarPage from "./pages/CalendarPage.svelte";
+    import Plans from "./pages/Plans.svelte";
     import Profile from "./pages/Profile.svelte";
     import Groups from "./components/Groups.svelte";
     import { setContext, getContext } from "svelte";
@@ -153,8 +154,12 @@
                 </div>
             </Route>
 
+            <Route path="/home-manage">
+                <HomeManage />
+            </Route>
+
             <Route path="/plans">
-                <CalendarPage />
+                <Plans />
             </Route>
 
             <Route path="/shopping-list">

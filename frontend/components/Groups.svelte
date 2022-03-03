@@ -31,7 +31,6 @@
         flex-flow: column;
         align-items: center;
         justify-content: center;
-        height: 100%;
 
         #groups {
             display: inline-block;
