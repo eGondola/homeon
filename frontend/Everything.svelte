@@ -6,7 +6,7 @@
     import { Router, link, Route } from "svelte-routing";
     import HomeManage from "./pages/HomeManage.svelte";
     import List from "./components/list.svelte";
-    import CalendarPage from "./pages/CalendarPage.svelte";
+    import Plans from "./pages/Plans.svelte";
     import Profile from "./pages/Profile.svelte";
     import Groups from "./components/Groups.svelte";
     import { setContext } from "svelte";
@@ -134,7 +134,7 @@
             </Route>
 
             <Route path="/plans">
-                <CalendarPage />
+                <Plans />
             </Route>
 
             <Route path="/shopping-list">
