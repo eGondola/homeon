@@ -159,6 +159,14 @@
         );
     }
 
+    function getPseudoRandomColor(text: string) {
+        return `hsl(${
+            ([...text].reduce((total, char) => total * char.charCodeAt(0), 1) *
+                16807) %
+            360
+        }, 100%, 70%)`;
+    }
+
     const daysOfWeek = [
         "Poniedziałek",
         "Wtorek",
@@ -169,7 +177,7 @@
         "Niedziela",
     ];
 
-    function PlanClick(text: string) {
+    function clickPlan(text: string) {
         plans.forEach((plan: Plan) => {
             if (plan.text == text) {
                 showPlan = plan;
@@ -229,19 +237,13 @@
                             {#each column as { top, bottom, width, text }}
                                 <div
                                     on:click|stopPropagation={() =>
-                                        PlanClick(text)}
+                                        clickPlan(text)}
                                     class="plan"
                                     style="top: {top * 100}%; bottom: {bottom *
                                         100}%; width: {width *
-                                        100}%; background: {`hsl(${
-                                        ([...text].reduce(
-                                            (total, char) =>
-                                                total * char.charCodeAt(0),
-                                            1
-                                        ) *
-                                            16807) %
-                                        360
-                                    }, 100%, 70%)`}"
+                                        100}%; background: {getPseudoRandomColor(
+                                        text
+                                    )}"
                                 >
                                     {text}
                                 </div>
@@ -271,14 +273,7 @@
                 <div
                     id="delete_plan"
                     on:click={async () => {
-                        await fetch("/api/remove-plan", {
-                            method: "POST",
-                            headers: {
-                                Accept: "application/json",
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify([$group.token, showPlan]),
-                        });
+                        await api.post("remove-plan", [$group.token, showPlan]);
                         showPlan = false;
                     }}
                 >
@@ -294,54 +289,57 @@
         </div>
     </div>
 {/if}
-<div class="popup popup_add" class:shown={popupShown}>
-    <div>
-        <form
-            on:submit|preventDefault={() => {
-                api.post("add-plan", {
-                    token: $group.token,
-                    plan: {
-                        start,
-                        end,
-                        text,
-                    },
-                });
-                plans = [
-                    ...plans,
-                    {
-                        start: new Date(start),
-                        end: new Date(end),
-                        text,
-                    },
-                ];
 
-                popupShown = false;
-            }}
-        >
-            <div class="exit_save">
-                <div class="popup_exit">
-                    <button
-                        type="button"
-                        on:click={() => {
-                            popupShown = false;
-                        }}><i class="icon-x" /></button
-                    >
-                </div>
-                <div class="popup_save">
-                    <button type="submit">Zapisz</button>
-                </div>
-            </div>
+{#if popupShown}
+    <div class="popup popup_add">
+        <div>
+            <form
+                on:submit|preventDefault={() => {
+                    api.post("add-plan", {
+                        token: $group.token,
+                        plan: {
+                            start,
+                            end,
+                            text,
+                        },
+                    });
+                    plans = [
+                        ...plans,
+                        {
+                            start: new Date(start),
+                            end: new Date(end),
+                            text,
+                        },
+                    ];
 
-            <div class="popup_date">
-                <input type="datetime-local" bind:value={start} />
-                <input type="datetime-local" bind:value={end} />
-            </div>
-            <div class="popup_title">
-                <input type="text" bind:value={text} />
-            </div>
-        </form>
+                    popupShown = false;
+                }}
+            >
+                <div class="exit_save">
+                    <div class="popup_exit">
+                        <button
+                            type="button"
+                            on:click={() => {
+                                popupShown = false;
+                            }}><i class="icon-x" /></button
+                        >
+                    </div>
+                    <div class="popup_save">
+                        <button type="submit">Zapisz</button>
+                    </div>
+                </div>
+
+                <div class="popup_date">
+                    <input type="datetime-local" bind:value={start} />
+                    <input type="datetime-local" bind:value={end} />
+                </div>
+                <div class="popup_title">
+                    <input type="text" bind:value={text} />
+                </div>
+            </form>
+        </div>
     </div>
-</div>
+{/if}
 
 <style lang="scss">
     @import "../styles/variables.scss";

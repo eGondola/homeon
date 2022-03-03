@@ -1,5 +1,6 @@
 .popup_add {
-    display: none;
+    display: flex;
+    flex-flow: column;
 }
 
 .popup {
@@ -18,12 +19,6 @@
     }
 
     padding: 5vmin;
-
-    &.shown {
-        display: flex;
-    }
-    flex-flow: column;
-
     background-color: white;
 
     .exit_save {
