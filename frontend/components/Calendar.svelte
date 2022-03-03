@@ -5,6 +5,8 @@
     import * as api from "../util/api";
     import { addDays } from "../util/date";
     import type { Group } from "../../common/types";
+    import PopupExitButton from "./PopupExitButton.svelte";
+    import PopupTopbar from "./PopupTopbar.svelte";
 
     export let date: Date;
 
@@ -258,86 +260,76 @@
 
 {#if showPlan}
     <div class="popup">
-        <div>
-            <div class="exit_save">
-                <div class="popup_exit">
-                    <button
-                        type="button"
-                        on:click={() => {
-                            showPlan = false;
-                        }}><i class="icon-x" /></button
-                    >
-                </div>
+        <PopupTopbar>
+            <PopupExitButton
+                click={() => {
+                    showPlan = false;
+                }}
+            />
+        </PopupTopbar>
+        <div class="popup_date">
+            <div
+                id="delete_plan"
+                on:click={async () => {
+                    await api.post("remove-plan", [$group.token, showPlan]);
+                    showPlan = false;
+                }}
+            >
+                <i class="icon-delete" />
             </div>
-            <div class="popup_date">
-                <div
-                    id="delete_plan"
-                    on:click={async () => {
-                        await api.post("remove-plan", [$group.token, showPlan]);
-                        showPlan = false;
-                    }}
-                >
-                    <i class="icon-delete" />
-                </div>
 
-                <DateText date={showPlan.start} />
-                {showPlan.start.getHours()}:{showPlan.start.getMinutes()} -
-                <DateText date={showPlan.end} />
-                {showPlan.end.getHours()}:{showPlan.end.getMinutes()}<br />
-                {showPlan.text}
-            </div>
+            <DateText date={showPlan.start} />
+            {showPlan.start.getHours()}:{showPlan.start.getMinutes()} -
+            <DateText date={showPlan.end} />
+            {showPlan.end.getHours()}:{showPlan.end.getMinutes()}<br />
+            {showPlan.text}
         </div>
     </div>
 {/if}
 
 {#if popupShown}
-    <div class="popup popup_add">
-        <div>
-            <form
-                on:submit|preventDefault={() => {
-                    api.post("add-plan", {
-                        token: $group.token,
-                        plan: {
-                            start,
-                            end,
-                            text,
-                        },
-                    });
-                    plans = [
-                        ...plans,
-                        {
-                            start: new Date(start),
-                            end: new Date(end),
-                            text,
-                        },
-                    ];
+    <div class="popup">
+        <form
+            on:submit|preventDefault={() => {
+                api.post("add-plan", {
+                    token: $group.token,
+                    plan: {
+                        start,
+                        end,
+                        text,
+                    },
+                });
+                plans = [
+                    ...plans,
+                    {
+                        start: new Date(start),
+                        end: new Date(end),
+                        text,
+                    },
+                ];
 
-                    popupShown = false;
-                }}
-            >
-                <div class="exit_save">
-                    <div class="popup_exit">
-                        <button
-                            type="button"
-                            on:click={() => {
-                                popupShown = false;
-                            }}><i class="icon-x" /></button
-                        >
-                    </div>
-                    <div class="popup_save">
-                        <button type="submit">Zapisz</button>
-                    </div>
+                popupShown = false;
+            }}
+        >
+            <PopupTopbar>
+                <PopupExitButton
+                    click={() => {
+                        popupShown = false;
+                    }}
+                />
+                <div class="popup_save">
+                    <button type="submit">Zapisz</button>
                 </div>
+            </PopupTopbar>
 
-                <div class="popup_date">
-                    <input type="datetime-local" bind:value={start} />
-                    <input type="datetime-local" bind:value={end} />
-                </div>
-                <div class="popup_title">
-                    <input type="text" bind:value={text} />
-                </div>
-            </form>
-        </div>
+            <div class="popup_date">
+                <input type="datetime-local" bind:value={start} />
+                <input type="datetime-local" bind:value={end} />
+            </div>
+            <div class="popup_title">
+                <input type="text" bind:value={text} />
+            </div>
+        </form>
     </div>
 {/if}
 
