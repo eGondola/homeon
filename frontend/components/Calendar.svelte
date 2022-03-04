@@ -5,11 +5,12 @@
     import * as api from "../util/api";
     import { addDays } from "../util/date";
     import type { Group } from "../../common/types";
-    import Popup from "./Popup";
+    import AddPlanPopup from "./AddPlanPopup.svelte";
+    import PlanPopup from "./PlanPopup.svelte";
 
     export let date: Date;
 
-    let showPlan: Plan | false = false;
+    let selectedPlan: Plan | false = false;
 
     const group = getContext<Writable<Group>>("group");
 
@@ -19,13 +20,8 @@
         text,
     }));
 
-    let popupShown = false;
+    let addPlanPopupShown = false;
     let innerWidth: number;
-    let start = new Date().toISOString().slice(0, 16);
-    let end = new Date(new Date(date).setHours(date.getHours() + 1))
-        .toISOString()
-        .slice(0, 16);
-    let text = "";
 
     $: monday = getMonday(date);
     $: nextMonday = addDays(monday, 7);
@@ -181,7 +177,7 @@
     function clickPlan(text: string) {
         plans.forEach((plan: Plan) => {
             if (plan.text == text) {
-                showPlan = plan;
+                selectedPlan = plan;
             }
         });
     }
@@ -230,7 +226,7 @@
                 <div
                     class="day"
                     on:click={() => {
-                        popupShown = true;
+                        addPlanPopupShown = true;
                     }}
                 >
                     {#each columns as column}
@@ -257,81 +253,47 @@
     </div>
 </div>
 
-{#if showPlan}
-    <Popup let:Topbar>
-        <Topbar
-            closePopup={() => {
-                showPlan = false;
-            }}
-        />
-        <div class="popup_date">
-            <div
-                id="delete_plan"
-                on:click={async () => {
-                    await api.post("remove-plan", [$group.token, showPlan]);
-                    showPlan = false;
-                }}
-            >
-                <i class="icon-delete" />
-            </div>
-
-            <DateText date={showPlan.start} />
-            {showPlan.start.getHours()}:{showPlan.start.getMinutes()} -
-            <DateText date={showPlan.end} />
-            {showPlan.end.getHours()}:{showPlan.end.getMinutes()}<br />
-            {showPlan.text}
-        </div>
-    </Popup>
+{#if selectedPlan}
+    <PlanPopup
+        removePlan={async (plan) => {
+            await api.post("remove-plan", [$group.token, plan]);
+        }}
+        plan={selectedPlan}
+        closePopup={() => {
+            selectedPlan = false;
+        }}
+    />
 {/if}
 
-{#if popupShown}
-    <Popup let:Topbar>
-        <form
-            on:submit|preventDefault={() => {
-                api.post("add-plan", {
-                    token: $group.token,
-                    plan: {
-                        start,
-                        end,
-                        text,
-                    },
-                });
-                plans = [
-                    ...plans,
-                    {
-                        start: new Date(start),
-                        end: new Date(end),
-                        text,
-                    },
-                ];
-
-                popupShown = false;
-            }}
-        >
-            <Topbar
-                closePopup={() => {
-                    popupShown = false;
-                }}
-            >
-                <div class="popup_save">
-                    <button type="submit">Zapisz</button>
-                </div>
-            </Topbar>
-
-            <div class="popup_date">
-                <input type="datetime-local" bind:value={start} />
-                <input type="datetime-local" bind:value={end} />
-            </div>
-            <div class="popup_title">
-                <input type="text" bind:value={text} />
-            </div>
-        </form>
-    </Popup>
+{#if addPlanPopupShown}
+    <AddPlanPopup
+        {date}
+        addPlan={async ({ start, end, text }) => {
+            await api.post("add-plan", {
+                token: $group.token,
+                plan: {
+                    start,
+                    end,
+                    text,
+                },
+            });
+            plans = [
+                ...plans,
+                {
+                    start: new Date(start),
+                    end: new Date(end),
+                    text,
+                },
+            ];
+        }}
+        closePopup={() => {
+            addPlanPopupShown = false;
+        }}
+    />
 {/if}
 
 <style lang="scss">
     @import "../styles/variables.scss";
-    @import "../styles/popup.scss";
 
     .calendar {
         font-size: 5vmin;

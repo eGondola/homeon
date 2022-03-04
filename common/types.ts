@@ -5,7 +5,7 @@ export type Group = {
     list: ListItem[];
 };
 
-type Plan = {
+export type Plan = {
     start: string;
     end: string;
     text: string;
