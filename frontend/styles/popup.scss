@@ -1,69 +1,48 @@
-.popup {
-    position: fixed;
+.popup_save {
+    button {
+        border-radius: 10vmin;
 
-    height: 100%;
-    width: 100%;
+        width: 20vmin;
+        height: 100%;
 
-    @media (min-width: 800px) {
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
+        text-transform: lowercase;
+        font-variant: small-caps;
 
-        height: 60%;
-        width: 80%;
+        border: none;
+        background-color: $p-color;
+        color: white;
+    }
+}
+
+.popup_date {
+    margin-bottom: 8vmin;
+    text-align: center;
+
+    #delete_plan {
+        font-size: 10vmin;
+        margin-bottom: 5vmin;
+        color: $s-color-dark;
     }
 
-    padding: 5vmin;
-    background-color: white;
+    input {
+        border: none;
+        width: 100%;
+        font-size: 7vmin;
+        color: $s-color;
+    }
+}
 
-    .popup_save {
-        margin-left: auto;
-
-        button {
-            border-radius: 10vmin;
-
-            width: 20vmin;
-            height: 100%;
-
-            text-transform: lowercase;
-            font-variant: small-caps;
-
-            border: none;
-            background-color: $p-color;
-            color: white;
-        }
+.popup_title {
+    input {
+        width: 100%;
+        border: 1px solid $p-color;
+        border-radius: 2vmin;
+        font-size: 5vmin;
+        padding-left: 1vmin;
+        padding-right: 1vmin;
     }
 
-    .popup_date {
-        margin-bottom: 8vmin;
-        text-align: center;
-
-        #delete_plan {
-            font-size: 10vmin;
-            margin-bottom: 5vmin;
-            color: $s-color-dark;
-        }
-
-        input {
-            border: none;
-            width: 100%;
-            font-size: 7vmin;
-            color: $s-color;
-        }
-    }
-
-    .popup_title {
-        input {
-            width: 100%;
-            border: 1px solid $p-color;
-            border-radius: 2vmin;
-            font-size: 5vmin;
-            padding-left: 1vmin;
-            padding-right: 1vmin;
-        }
-
-        input:focus {
-            outline: 1px solid $p-color;
-        }
+    input:focus {
+        outline: 1px solid $p-color;
     }
 }

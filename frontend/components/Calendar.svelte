@@ -5,15 +5,14 @@
     import * as api from "../util/api";
     import { addDays } from "../util/date";
     import type { Group } from "../../common/types";
-    import PopupExitButton from "./PopupExitButton.svelte";
-    import PopupTopbar from "./PopupTopbar.svelte";
+    import Popup from "./Popup";
 
     export let date: Date;
 
     let showPlan: Plan | false = false;
 
     const group = getContext<Writable<Group>>("group");
-        
+
     $: plans = $group.plans.map(({ start, end, text }) => ({
         start: new Date(start),
         end: new Date(end),
@@ -259,14 +258,12 @@
 </div>
 
 {#if showPlan}
-    <div class="popup">
-        <PopupTopbar>
-            <PopupExitButton
-                click={() => {
-                    showPlan = false;
-                }}
-            />
-        </PopupTopbar>
+    <Popup let:Topbar>
+        <Topbar
+            closePopup={() => {
+                showPlan = false;
+            }}
+        />
         <div class="popup_date">
             <div
                 id="delete_plan"
@@ -284,11 +281,11 @@
             {showPlan.end.getHours()}:{showPlan.end.getMinutes()}<br />
             {showPlan.text}
         </div>
-    </div>
+    </Popup>
 {/if}
 
 {#if popupShown}
-    <div class="popup">
+    <Popup let:Topbar>
         <form
             on:submit|preventDefault={() => {
                 api.post("add-plan", {
@@ -311,16 +308,15 @@
                 popupShown = false;
             }}
         >
-            <PopupTopbar>
-                <PopupExitButton
-                    click={() => {
-                        popupShown = false;
-                    }}
-                />
+            <Topbar
+                closePopup={() => {
+                    popupShown = false;
+                }}
+            >
                 <div class="popup_save">
                     <button type="submit">Zapisz</button>
                 </div>
-            </PopupTopbar>
+            </Topbar>
 
             <div class="popup_date">
                 <input type="datetime-local" bind:value={start} />
@@ -330,7 +326,7 @@
                 <input type="text" bind:value={text} />
             </div>
         </form>
-    </div>
+    </Popup>
 {/if}
 
 <style lang="scss">
