@@ -1,9 +1,9 @@
 <script type="ts">
     import Popup from "./Popup";
-    import type { Plan } from "../../common/types";
+    import type { SerializedPlan } from "../../common/types";
 
     export let date: Date;
-    export let addPlan: (plan: Plan) => Promise<void>;
+    export let addPlan: (plan: SerializedPlan) => Promise<void>;
     export let closePopup: () => void;
 
     let start = new Date().toISOString().slice(0, 16);

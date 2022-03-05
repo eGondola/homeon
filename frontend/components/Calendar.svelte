@@ -3,8 +3,13 @@
     import { getContext } from "svelte";
     import DateText from "./DateText.svelte";
     import * as api from "../util/api";
-    import { addDays } from "../util/date";
-    import type { Group } from "../../common/types";
+    import {
+        addDays,
+        getFractionOfDayPassed,
+        getMonday,
+        isSameDate,
+    } from "../util/date";
+    import type { Group, SerializedPlan } from "../../common/types";
     import AddPlanPopup from "./AddPlanPopup.svelte";
     import PlanPopup from "./PlanPopup.svelte";
 
@@ -14,11 +19,7 @@
 
     const group = getContext<Writable<Group>>("group");
 
-    $: plans = $group.plans.map(({ start, end, text }) => ({
-        start: new Date(start),
-        end: new Date(end),
-        text,
-    }));
+    $: plans = $group.plans.map(deserializePlan);
 
     let addPlanPopupShown = false;
     let innerWidth: number;
@@ -94,7 +95,7 @@
         }
     }
 
-    function generateDayPlans(plans: Plans, weekBegin: Date, weekEnd: Date) {
+    function generateDayPlans(plans: Plan[], weekBegin: Date, weekEnd: Date) {
         const dayPlans: DayPlan[][] = Array.from({ length: 7 }, () => []);
         for (const { start, end, text } of plans.filter(isThisWeek)) {
             let i = start <= monday ? 0 : start.getDay() - 1;
@@ -132,30 +133,6 @@
         return hours;
     }
 
-    function getFractionOfDayPassed(date: Date) {
-        const hours = date.getHours();
-        const minutes = date.getMinutes();
-        return (hours + minutes / 60) / 24;
-    }
-
-    function getMonday(date: Date) {
-        return new Date(
-            date.getFullYear(),
-            date.getMonth(),
-            date.getDay() == 0
-                ? date.getDate() - 6
-                : date.getDate() - date.getDay() + 1
-        );
-    }
-
-    function isSameDate(first: Date, second: Date) {
-        return (
-            first.getFullYear() == second.getFullYear() &&
-            first.getMonth() == second.getMonth() &&
-            first.getDate() == second.getDate()
-        );
-    }
-
     function getPseudoRandomColor(text: string) {
         return `hsl(${
             ([...text].reduce((total, char) => total * char.charCodeAt(0), 1) *
@@ -175,11 +152,19 @@
     ];
 
     function clickPlan(text: string) {
-        plans.forEach((plan: Plan) => {
+        plans.forEach((plan) => {
             if (plan.text == text) {
                 selectedPlan = plan;
             }
         });
+    }
+
+    function deserializePlan({ start, end, text }: SerializedPlan): Plan {
+        return {
+            start: new Date(start),
+            end: new Date(end),
+            text,
+        };
     }
 
     type DayPlan = {
@@ -187,8 +172,6 @@
         bottom: number;
         text: string;
     };
-
-    type Plans = Plan[];
 
     type Plan = {
         start: Date;
@@ -268,23 +251,12 @@
 {#if addPlanPopupShown}
     <AddPlanPopup
         {date}
-        addPlan={async ({ start, end, text }) => {
+        addPlan={async (plan) => {
             await api.post("add-plan", {
                 token: $group.token,
-                plan: {
-                    start,
-                    end,
-                    text,
-                },
+                plan,
             });
-            plans = [
-                ...plans,
-                {
-                    start: new Date(start),
-                    end: new Date(end),
-                    text,
-                },
-            ];
+            plans = [...plans, deserializePlan(plan)];
         }}
         closePopup={() => {
             addPlanPopupShown = false;
