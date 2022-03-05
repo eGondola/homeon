@@ -1,6 +1,6 @@
 <script type="ts">
     import Popup from "./Popup";
-    import DateText from "./DateText.svelte";
+    import { makeDateText } from "../util/date";
 
     export let removePlan: (plan: Plan) => Promise<void>;
     export let closePopup: () => void;
@@ -29,9 +29,9 @@
             <i class="icon-delete" />
         </div>
 
-        <DateText date={start} />
+        {makeDateText(start)}
         {start.getHours()}:{start.getMinutes()} -
-        <DateText date={end} />
+        {makeDateText(end)}
         {end.getHours()}:{end.getMinutes()}<br />
         {text}
     </div>

@@ -1,3 +1,38 @@
+export const daysOfTheWeek = [
+    "Poniedziałek",
+    "Wtorek",
+    "Środa",
+    "Czwartek",
+    "Piątek",
+    "Sobota",
+    "Niedziela",
+];
+
+const months = [
+    "stycznia",
+    "lutego",
+    "marca",
+    "kwietnia",
+    "maja",
+    "czerwca",
+    "lipca",
+    "sierpnia",
+    "września",
+    "października",
+    "listopada",
+    "grudnia",
+];
+
+export function makeDateText(date: Date) {
+    const day = date.getDate();
+    const month = getMonthText(date);
+    return `${day} ${month}`;
+}
+
+function getMonthText(date: Date) {
+    return months[date.getMonth()];
+}
+
 export function addDays(date: Date, days: number) {
     const copy = new Date(date);
     copy.setDate(date.getDate() + days);

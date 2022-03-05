@@ -9,6 +9,7 @@ export type SerializedPlan = {
     start: string;
     end: string;
     text: string;
+    weekDays?: boolean[];
 };
 
 export type User = {

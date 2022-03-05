@@ -1,13 +1,13 @@
 <script type="ts">
     import type { Writable } from "svelte/store";
     import { getContext } from "svelte";
-    import DateText from "./DateText.svelte";
     import * as api from "../util/api";
     import {
         addDays,
         getFractionOfDayPassed,
         getMonday,
         isSameDate,
+        makeDateText,
     } from "../util/date";
     import type { Group, SerializedPlan } from "../../common/types";
     import AddPlanPopup from "./AddPlanPopup.svelte";
@@ -97,11 +97,59 @@
 
     function generateDayPlans(plans: Plan[], weekBegin: Date, weekEnd: Date) {
         const dayPlans: DayPlan[][] = Array.from({ length: 7 }, () => []);
-        for (const { start, end, text } of plans.filter(isThisWeek)) {
-            let i = start <= monday ? 0 : start.getDay() - 1;
+        for (const { start, end, text, weekDays } of plans.filter(isThisWeek)) {
+            if (weekDays) {
+                weekDays.forEach((repeats, weekDay) => {
+                    if (!repeats) return;
+                    const today = addDays(monday, weekDay);
+                    const endDay = addDays(today, getDaysBetweenDates(start, end));
+                    generateDayPlan({
+                        start: new Date(
+                            today.getFullYear(),
+                            today.getMonth(),
+                            today.getDate(),
+                            start.getHours(),
+                            start.getMinutes()
+                        ),
+                        end: new Date(
+                            endDay.getFullYear(),
+                            endDay.getMonth(),
+                            endDay.getDate(),
+                            end.getHours(),
+                            end.getMinutes()
+                        ),
+                        text,
+                    });
+                });
+            } else {
+                generateDayPlan({ start, end, text });
+            }
+        }
+        return dayPlans;
+
+        function isThisWeek({ start, end, weekDays }: Plan) {
+            return (
+                weekDays ||
+                (start >= weekBegin && start <= weekEnd) ||
+                (end >= weekBegin && end <= weekEnd) ||
+                (start <= weekBegin && end >= weekEnd)
+            );
+        }
+
+        function generateDayPlan({
+            start,
+            end,
+            text,
+        }: {
+            start: Date;
+            end: Date;
+            text: string;
+        }) {
+            let i = start <= monday ? 0 : (start.getDay() - 1 + 7) % 7;
             let current: Date;
             do {
                 current = addDays(monday, i);
+                console.log(i);
                 dayPlans[i].push({
                     top: isSameDate(current, start)
                         ? getFractionOfDayPassed(start)
@@ -114,14 +162,11 @@
                 ++i;
             } while (!isSameDate(current, end) && i < 7);
         }
-        return dayPlans;
 
-        function isThisWeek({ start, end }: Plan) {
-            return (
-                (start >= weekBegin && start <= weekEnd) ||
-                (end >= weekBegin && end <= weekEnd) ||
-                (start <= weekBegin && end >= weekEnd)
-            );
+        function getDaysBetweenDates(start: Date, end: Date) {
+            const startDay = start.getDay();
+            const endDay = end.getDay();
+            return endDay - startDay + (startDay <= endDay ? 0 : 7);
         }
     }
 
@@ -159,11 +204,11 @@
         });
     }
 
-    function deserializePlan({ start, end, text }: SerializedPlan): Plan {
+    function deserializePlan({ start, end, ...rest }: SerializedPlan): Plan {
         return {
             start: new Date(start),
             end: new Date(end),
-            text,
+            ...rest,
         };
     }
 
@@ -177,6 +222,7 @@
         start: Date;
         end: Date;
         text: string;
+        weekDays?: boolean[];
     };
 </script>
 
@@ -185,11 +231,11 @@
     <div class="calendar-header">
         <div class="date-texts">
             {#if innerWidth < 800}
-                <DateText {date} />
+                {makeDateText(date)}
             {:else}
-                <DateText date={monday} />
+                {makeDateText(monday)}
                 <br />
-                <DateText date={nextMonday} />
+                {makeDateText(nextMonday)}
             {/if}
         </div>
         <div class="days-header">

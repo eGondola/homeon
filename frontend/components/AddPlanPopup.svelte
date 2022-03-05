@@ -1,6 +1,7 @@
 <script type="ts">
     import Popup from "./Popup";
     import type { SerializedPlan } from "../../common/types";
+    import { daysOfTheWeek } from "../util/date";
 
     export let date: Date;
     export let addPlan: (plan: SerializedPlan) => Promise<void>;
@@ -11,12 +12,19 @@
         .toISOString()
         .slice(0, 16);
     let text = "";
+    let shouldRepeat = false;
+    let weekDays = daysOfTheWeek.map(() => false);
 </script>
 
 <Popup let:Topbar>
     <form
         on:submit|preventDefault={async () => {
-            await addPlan({ start, end, text });
+            await addPlan({
+                start,
+                end,
+                text,
+                ...(shouldRepeat ? { weekDays } : {}),
+            });
             closePopup();
         }}
     >
@@ -34,11 +42,29 @@
         <div class="text">
             <input type="text" bind:value={text} />
         </div>
+
+        <label>
+            <input type="checkbox" bind:checked={shouldRepeat} />
+            Powtarzaj
+        </label>
+
+        {#if shouldRepeat}
+            {#each daysOfTheWeek as day, i}
+                <label>
+                    <input type="checkbox" bind:checked={weekDays[i]} />
+                    {day}
+                </label>
+            {/each}
+        {/if}
     </form>
 </Popup>
 
 <style lang="scss">
     @use "../styles/variables.scss" as *;
+
+    label {
+        display: block;
+    }
 
     .save {
         button {
