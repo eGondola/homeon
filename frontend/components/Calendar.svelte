@@ -1,32 +1,28 @@
 <script type="ts">
     import type { Writable } from "svelte/store";
     import { getContext } from "svelte";
-    import DateText from "./DateText.svelte";
     import * as api from "../util/api";
-    import { addDays } from "../util/date";
-    import type { Group } from "../../common/types";
-    import PopupExitButton from "./PopupExitButton.svelte";
-    import PopupTopbar from "./PopupTopbar.svelte";
+    import {
+        addDays,
+        getFractionOfDayPassed,
+        getMonday,
+        isSameDate,
+        makeDateText,
+    } from "../util/date";
+    import type { Group, SerializedPlan } from "../../common/types";
+    import AddPlanPopup from "./AddPlanPopup.svelte";
+    import PlanPopup from "./PlanPopup.svelte";
 
     export let date: Date;
 
-    let showPlan: Plan | false = false;
+    let selectedPlan: Plan | false = false;
 
     const group = getContext<Writable<Group>>("group");
-        
-    $: plans = $group.plans.map(({ start, end, text }) => ({
-        start: new Date(start),
-        end: new Date(end),
-        text,
-    }));
 
-    let popupShown = false;
+    $: plans = $group.plans.map(deserializePlan);
+
+    let addPlanPopupShown = false;
     let innerWidth: number;
-    let start = new Date().toISOString().slice(0, 16);
-    let end = new Date(new Date(date).setHours(date.getHours() + 1))
-        .toISOString()
-        .slice(0, 16);
-    let text = "";
 
     $: monday = getMonday(date);
     $: nextMonday = addDays(monday, 7);
@@ -99,13 +95,61 @@
         }
     }
 
-    function generateDayPlans(plans: Plans, weekBegin: Date, weekEnd: Date) {
+    function generateDayPlans(plans: Plan[], weekBegin: Date, weekEnd: Date) {
         const dayPlans: DayPlan[][] = Array.from({ length: 7 }, () => []);
-        for (const { start, end, text } of plans.filter(isThisWeek)) {
-            let i = start <= monday ? 0 : start.getDay() - 1;
+        for (const { start, end, text, weekDays } of plans.filter(isThisWeek)) {
+            if (weekDays) {
+                weekDays.forEach((repeats, weekDay) => {
+                    if (!repeats) return;
+                    const today = addDays(monday, weekDay);
+                    const endDay = addDays(today, getDaysBetweenDates(start, end));
+                    generateDayPlan({
+                        start: new Date(
+                            today.getFullYear(),
+                            today.getMonth(),
+                            today.getDate(),
+                            start.getHours(),
+                            start.getMinutes()
+                        ),
+                        end: new Date(
+                            endDay.getFullYear(),
+                            endDay.getMonth(),
+                            endDay.getDate(),
+                            end.getHours(),
+                            end.getMinutes()
+                        ),
+                        text,
+                    });
+                });
+            } else {
+                generateDayPlan({ start, end, text });
+            }
+        }
+        return dayPlans;
+
+        function isThisWeek({ start, end, weekDays }: Plan) {
+            return (
+                weekDays ||
+                (start >= weekBegin && start <= weekEnd) ||
+                (end >= weekBegin && end <= weekEnd) ||
+                (start <= weekBegin && end >= weekEnd)
+            );
+        }
+
+        function generateDayPlan({
+            start,
+            end,
+            text,
+        }: {
+            start: Date;
+            end: Date;
+            text: string;
+        }) {
+            let i = start <= monday ? 0 : (start.getDay() - 1 + 7) % 7;
             let current: Date;
             do {
                 current = addDays(monday, i);
+                console.log(i);
                 dayPlans[i].push({
                     top: isSameDate(current, start)
                         ? getFractionOfDayPassed(start)
@@ -118,14 +162,11 @@
                 ++i;
             } while (!isSameDate(current, end) && i < 7);
         }
-        return dayPlans;
 
-        function isThisWeek({ start, end }: Plan) {
-            return (
-                (start >= weekBegin && start <= weekEnd) ||
-                (end >= weekBegin && end <= weekEnd) ||
-                (start <= weekBegin && end >= weekEnd)
-            );
+        function getDaysBetweenDates(start: Date, end: Date) {
+            const startDay = start.getDay();
+            const endDay = end.getDay();
+            return endDay - startDay + (startDay <= endDay ? 0 : 7);
         }
     }
 
@@ -135,30 +176,6 @@
             hours.push(i > 12 ? i - 12 + ` PM` : i + ` AM`);
         }
         return hours;
-    }
-
-    function getFractionOfDayPassed(date: Date) {
-        const hours = date.getHours();
-        const minutes = date.getMinutes();
-        return (hours + minutes / 60) / 24;
-    }
-
-    function getMonday(date: Date) {
-        return new Date(
-            date.getFullYear(),
-            date.getMonth(),
-            date.getDay() == 0
-                ? date.getDate() - 6
-                : date.getDate() - date.getDay() + 1
-        );
-    }
-
-    function isSameDate(first: Date, second: Date) {
-        return (
-            first.getFullYear() == second.getFullYear() &&
-            first.getMonth() == second.getMonth() &&
-            first.getDate() == second.getDate()
-        );
     }
 
     function getPseudoRandomColor(text: string) {
@@ -180,11 +197,19 @@
     ];
 
     function clickPlan(text: string) {
-        plans.forEach((plan: Plan) => {
+        plans.forEach((plan) => {
             if (plan.text == text) {
-                showPlan = plan;
+                selectedPlan = plan;
             }
         });
+    }
+
+    function deserializePlan({ start, end, ...rest }: SerializedPlan): Plan {
+        return {
+            start: new Date(start),
+            end: new Date(end),
+            ...rest,
+        };
     }
 
     type DayPlan = {
@@ -193,12 +218,11 @@
         text: string;
     };
 
-    type Plans = Plan[];
-
     type Plan = {
         start: Date;
         end: Date;
         text: string;
+        weekDays?: boolean[];
     };
 </script>
 
@@ -207,11 +231,11 @@
     <div class="calendar-header">
         <div class="date-texts">
             {#if innerWidth < 800}
-                <DateText {date} />
+                {makeDateText(date)}
             {:else}
-                <DateText date={monday} />
+                {makeDateText(monday)}
                 <br />
-                <DateText date={nextMonday} />
+                {makeDateText(nextMonday)}
             {/if}
         </div>
         <div class="days-header">
@@ -231,7 +255,7 @@
                 <div
                     class="day"
                     on:click={() => {
-                        popupShown = true;
+                        addPlanPopupShown = true;
                     }}
                 >
                     {#each columns as column}
@@ -258,84 +282,36 @@
     </div>
 </div>
 
-{#if showPlan}
-    <div class="popup">
-        <PopupTopbar>
-            <PopupExitButton
-                click={() => {
-                    showPlan = false;
-                }}
-            />
-        </PopupTopbar>
-        <div class="popup_date">
-            <div
-                id="delete_plan"
-                on:click={async () => {
-                    await api.post("remove-plan", [$group.token, showPlan]);
-                    showPlan = false;
-                }}
-            >
-                <i class="icon-delete" />
-            </div>
-
-            <DateText date={showPlan.start} />
-            {showPlan.start.getHours()}:{showPlan.start.getMinutes()} -
-            <DateText date={showPlan.end} />
-            {showPlan.end.getHours()}:{showPlan.end.getMinutes()}<br />
-            {showPlan.text}
-        </div>
-    </div>
+{#if selectedPlan}
+    <PlanPopup
+        removePlan={async (plan) => {
+            await api.post("remove-plan", [$group.token, plan]);
+        }}
+        plan={selectedPlan}
+        closePopup={() => {
+            selectedPlan = false;
+        }}
+    />
 {/if}
 
-{#if popupShown}
-    <div class="popup">
-        <form
-            on:submit|preventDefault={() => {
-                api.post("add-plan", {
-                    token: $group.token,
-                    plan: {
-                        start,
-                        end,
-                        text,
-                    },
-                });
-                plans = [
-                    ...plans,
-                    {
-                        start: new Date(start),
-                        end: new Date(end),
-                        text,
-                    },
-                ];
-
-                popupShown = false;
-            }}
-        >
-            <PopupTopbar>
-                <PopupExitButton
-                    click={() => {
-                        popupShown = false;
-                    }}
-                />
-                <div class="popup_save">
-                    <button type="submit">Zapisz</button>
-                </div>
-            </PopupTopbar>
-
-            <div class="popup_date">
-                <input type="datetime-local" bind:value={start} />
-                <input type="datetime-local" bind:value={end} />
-            </div>
-            <div class="popup_title">
-                <input type="text" bind:value={text} />
-            </div>
-        </form>
-    </div>
+{#if addPlanPopupShown}
+    <AddPlanPopup
+        {date}
+        addPlan={async (plan) => {
+            await api.post("add-plan", {
+                token: $group.token,
+                plan,
+            });
+            plans = [...plans, deserializePlan(plan)];
+        }}
+        closePopup={() => {
+            addPlanPopupShown = false;
+        }}
+    />
 {/if}
 
 <style lang="scss">
     @import "../styles/variables.scss";
-    @import "../styles/popup.scss";
 
     .calendar {
         font-size: 5vmin;

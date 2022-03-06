@@ -1,14 +1,15 @@
 export type Group = {
     name: string;
     token: string;
-    plans: Plan[];
+    plans: SerializedPlan[];
     list: ListItem[];
 };
 
-type Plan = {
+export type SerializedPlan = {
     start: string;
     end: string;
     text: string;
+    weekDays?: boolean[];
 };
 
 export type User = {
