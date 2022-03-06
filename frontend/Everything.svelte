@@ -1,3 +1,7 @@
+<svelte:head>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyABA_utwjiBnqR4aUOIbCTieCBZO7gryKM">
+</script>
+</svelte:head>
 <script context="module" type="ts">
     declare const io: typeof import("socket.io-client").io;
 </script>

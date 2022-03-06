@@ -8,6 +8,7 @@
         "dev:backend": "ts-node-dev backend/app.ts"
     },
     "dependencies": {
+        "@googlemaps/markerwithlabel": "^2.0.6",
         "@rollup/plugin-commonjs": "^21.0.1",
         "bcryptjs": "^2.4.3",
         "cookie-session": "^2.0.0",
