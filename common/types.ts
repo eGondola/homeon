@@ -22,7 +22,9 @@ export type position = {
     position: {
         x: number,
         y: number
-    }
+    },
+    time: number,
+    street: string
 };
 
 type ListItem = {

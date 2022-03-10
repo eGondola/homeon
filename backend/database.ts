@@ -28,4 +28,6 @@ type User = {
     confirmEmailToken?: string;
     groups: string[];
     position: {x: number, y: number};
+    time: number,
+    street: string
 };

@@ -1,4 +1,4 @@
-import express from "express";
+import express, { response } from "express";
 import path from "path";
 import { getDatabase } from "./database";
 import bcrypt from "bcryptjs";
@@ -7,6 +7,7 @@ import cookieSession from "cookie-session";
 import http from "http";
 import { Server } from "socket.io";
 import { send } from "process";
+import axios from "axios"
 
 main();
 
@@ -22,8 +23,10 @@ async function main() {
             socket.join(newGroup?.token);
         })
         socket.on("newPosition", async obj => {
+            let url = `https://api.opencagedata.com/geocode/v1/json?q=${obj.position.x}+${obj.position.y}&key=6f9855f0d9d04be3b7d02f810a09b3ca`;
+            let street = (await axios.get(url)).data.results[0].formatted;
             await database.users.updateOne({login: obj.user.login, email: obj.user.email}, 
-                {$set: {position: obj.position}})
+                {$set: {position: obj.position, time: obj.time, street: street}})
             io.to(obj.group.token).emit("position", await GetPositions(obj.group.token));
         })
         socket.on("getPositions", async group => {
@@ -38,15 +41,21 @@ async function main() {
         }
         interface pos {
             login: string,
-            position: position
+            position: position,
+            street: string,
+            time: number
         }
         let users = await database.users.find({groups: token}).toArray();
         let positions:pos[] = [];
-        users.forEach(user => {
-            positions.push({position: user?.position, login: user?.login});
-        })
+        for(const user of users)
+        {
+            positions.push({position: user?.position, login: user?.login, street: user?.street, time: user?.time});
+        }
+            
         return positions;
     }
+    
+    
     /*async function GetList(token: string)
     {
         io.to(token).emit("List", )        
@@ -240,7 +249,9 @@ async function main() {
                 email: req.body.email,
                 confirmEmailToken,
                 groups: [personalGroupToken],
-                position: {x: 0, y: 0}
+                position: {x: 0, y: 0},
+                time: 0,
+                street: ""
             }),
             database.groups.insertOne({
                 name: "Osobiste",

@@ -48,17 +48,27 @@
     let editProfile = false;
 
     const user = getContext<Writable<User>>("user");
+    const d = new Date();
 
     navigator.geolocation.watchPosition(
     pos => {
         let obj = {
             user: $user, 
-            position: {x: pos.coords.latitude, y: pos.coords.longitude}, 
+            position: {x: pos.coords.latitude, y: pos.coords.longitude},
+            time: d.getTime(),
             group: $currentGroup
         };
         socket.emit("newPosition", obj)
     },
-    err => console.log(err)
+    err => {
+        let obj = {
+            user: $user,
+            positions: err.message,
+            time: d.getTime(),
+            groups, $currentGroup
+        }
+        socket.emit("newPosition", obj);
+    }
     );
 </script>
 
