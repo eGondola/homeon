@@ -7,7 +7,7 @@
     export let addPlan: (plan: SerializedPlan) => Promise<void>;
     export let closePopup: () => void;
 
-    let start = new Date().toISOString().slice(0, 16);
+    let start = date.toISOString().slice(0, 16);
     let end = new Date(new Date(date).setHours(date.getHours() + 1))
         .toISOString()
         .slice(0, 16);
