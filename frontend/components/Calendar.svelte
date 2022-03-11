@@ -315,11 +315,10 @@
 
     .calendar {
         font-size: 5vmin;
+
         @media (min-width: 800px) {
             font-size: 3vmin;
         }
-
-        font-variant: small-caps;
 
         .calendar-header {
             display: flex;

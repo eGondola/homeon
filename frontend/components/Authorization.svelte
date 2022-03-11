@@ -14,7 +14,7 @@
 <div class="authorization">
     <div class="app-logo">
         <div>Home ON</div>
-        <div>dla rodziny</div>
+        <div>Inteligentny Dom</div>
     </div>
     <div class="profile">
         <div>
@@ -43,7 +43,6 @@
             align-items: center;
             justify-content: center;
 
-            font-variant: small-caps;
             color: white;
 
             > div {
@@ -69,8 +68,6 @@
                 display: flex;
                 flex-flow: column;
                 align-items: center;
-
-                font-variant: small-caps;
             }
 
             button {
@@ -86,8 +83,6 @@
                 background-color: $s-color-dark + e6;
                 color: #ffffffe6;
                 font-size: 4vmin;
-                text-transform: lowercase;
-                font-variant: small-caps;
             }
         }
     }

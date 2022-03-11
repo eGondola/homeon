@@ -40,8 +40,6 @@
             padding: 5vmin 4vmin;
 
             color: white;
-            text-transform: lowercase;
-            font-variant: small-caps;
 
             > div {
                 display: inline;

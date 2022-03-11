@@ -5,8 +5,6 @@
     flex-flow: column;
     align-items: center;
 
-    font-variant: small-caps;
-    
     span {
         position: relative;
 
@@ -15,20 +13,20 @@
         input {
             height: 12.5vmin;
             width: 75vmin;
-            
+
             border: none;
             border-bottom: 0.7vmin solid #afbdcf;
             box-shadow: none;
 
             padding-left: 5vmin;
-            
+
             background-color: unset;
             font-size: 4vmin;
             color: white;
-            font-variant: small-caps;
         }
 
-        input:focus + label, input:valid + label {
+        input:focus + label,
+        input:valid + label {
             top: -1vmin;
             left: 2.5vmin;
 
@@ -39,20 +37,20 @@
         }
 
         input:focus {
-            outline:none;
+            outline: none;
         }
 
         label {
             position: absolute;
             top: 0;
             left: 0;
-            transition:0.2s ease all; 
-            -moz-transition:0.2s ease all; 
-            -webkit-transition:0.2s ease all;
+            transition: 0.2s ease all;
+            -moz-transition: 0.2s ease all;
+            -webkit-transition: 0.2s ease all;
             pointer-events: none;
-            
+
             padding: 4vmin;
-            
+
             font-size: 5vmin;
             color: #afbdcf;
         }
@@ -61,23 +59,21 @@
     p {
         font-size: 5vmin;
         color: white;
-        text-transform: lowercase;
         text-align: center;
     }
 
     button {
         border: none;
         border-radius: 2vmin;
-        
+
         padding: 3vmin 7.5vmin;
         margin: 1.5vmin;
 
-        box-shadow: -0.5vmin -0.5vmin 1vmin 0vmin #00000040, 0.5vmin 0.5vmin 1vmin 0vmin #00000040;
-        
+        box-shadow: -0.5vmin -0.5vmin 1vmin 0vmin #00000040,
+            0.5vmin 0.5vmin 1vmin 0vmin #00000040;
+
         background-color: $s-color-dark;
         color: white;
         font-size: 5vmin;
-        text-transform: lowercase;
-        font-variant: small-caps;
     }
 }

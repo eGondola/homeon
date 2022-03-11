@@ -82,8 +82,6 @@
         justify-content: center;
 
         color: white;
-        text-transform: lowercase;
-        font-variant: small-caps;
 
         #groups {
             width: 100%;

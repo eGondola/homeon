@@ -73,9 +73,6 @@
             width: 20vmin;
             height: 100%;
 
-            text-transform: lowercase;
-            font-variant: small-caps;
-
             border: none;
             background-color: $p-color;
             color: white;

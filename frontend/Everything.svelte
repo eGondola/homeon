@@ -295,9 +295,6 @@
 
                 background-color: $p-color-dark;
                 border-radius: 0vmin 0vmin 2vmin 2vmin;
-
-                text-transform: lowercase;
-                font-variant: small-caps;
             }
 
             #profile {

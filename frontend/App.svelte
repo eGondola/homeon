@@ -4,8 +4,9 @@
     import * as api from "./util/api";
     import { setContext } from "svelte";
     import { writable } from "svelte/store";
+
     let u = writable("");
-    let user = setContext("user", u);
+    setContext("user", u);
     api.get("checkLogin").then(res => $u = res)
 </script>
 
@@ -24,5 +25,9 @@
 
     :global(*, ::before, ::after) {
         box-sizing: border-box;
+    }
+
+    :global(input:not([type=datetime-local]), button) {
+        font-family: inherit;
     }
 </style>
