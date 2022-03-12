@@ -1,8 +1,7 @@
 <svelte:head>
     <style>
          .labels {
-        color: #ea4335;
-        background-color: white;
+        color: #ffffff;
         font-family: Roboto, Arial, sans-serif;
         font-size: 10px;
         font-weight: bold;
@@ -12,6 +11,9 @@
         border: 1px solid #999;
         box-sizing: border-box;
         white-space: nowrap;
+        margin: 1vmin;
+        border-radius: 10vmin;
+        background-color: #ff7043;
       }
     </style>
 </svelte:head>
@@ -77,10 +79,15 @@
 </script>
 <div id="map"></div>
 {#each $positions as position}
-    {position.login}
-    <br>
-    {position.street} widziany ostatnio {new Date(position.time).today()} {new Date(position.time).timeNow()}
-    <br>
+    <div>
+        Użytkownik 
+        {position.login}
+        był w 
+        {position.street} 
+        widziany ostatnio 
+        {new Date(position.time).today()} {new Date(position.time).timeNow()}
+        <br>
+    </div>
 {/each}
 <style>
     #map {

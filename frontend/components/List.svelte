@@ -53,9 +53,9 @@
     </div>
 {/each}
 <div class="input-group">
-    <input type="text" bind:value={text} />
-    <input type="number" bind:value={count} />
-    <input type="submit" on:click={sendForm} />
+    <div>Nazwa: <input type="text" bind:value={text} /></div>
+    <div>Sztuki: <input type="number" bind:value={count} /></div>
+    <input type="submit" on:click={sendForm} id="submit" />
 </div>
 {message}
 
@@ -66,7 +66,7 @@
         left: -10px;
         width: 50px;
         height: 50px;
-        background: #ff6a95;
+        background: #546e7a;
         color: #fff;
         border: 1px #eee solid;
         border-radius: 50%;
@@ -85,7 +85,7 @@
     }
 
     .card {
-        background-color: rgb(121, 3, 121);
+        background-color: #c63f17;
         color: rgb(233, 233, 255);
         border-radius: 15px;
         padding: 40px 50px;
@@ -94,9 +94,9 @@
     }
 
     .input-group {
-        background-color: rgb(121, 3, 121);
+        background-color: #c63f17;
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         border: 1px solid #ccc;
         padding: 8px 10px;
         border-radius: 8px;
@@ -105,9 +105,19 @@
     input {
         margin: 5px;
         font-size: 16px;
+        float: right;
+        border-radius: 2px;
     }
 
     input:focus {
         outline: none;
+    }
+
+    #submit {
+        border: black 1px solid;
+        border-radius: 15%;
+        width: 100px;
+        background-color: #ffa270;
+        color: white;
     }
 </style>
