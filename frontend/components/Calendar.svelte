@@ -102,7 +102,10 @@
                 weekDays.forEach((repeats, weekDay) => {
                     if (!repeats) return;
                     const today = addDays(monday, weekDay);
-                    const endDay = addDays(today, getDaysBetweenDates(start, end));
+                    const endDay = addDays(
+                        today,
+                        getDaysBetweenDates(start, end)
+                    );
                     generateDayPlan({
                         start: new Date(
                             today.getFullYear(),
@@ -228,7 +231,7 @@
 
 <svelte:window bind:innerWidth />
 <div class="calendar">
-    <div class="calendar-header">
+    <div class="calendar__header">
         <div class="date-texts">
             {#if innerWidth < 800}
                 {makeDateText(date)}
@@ -261,18 +264,21 @@
                     {#each columns as column}
                         <div class="column">
                             {#each column as { top, bottom, width, text }}
-                                <div
-                                    on:click|stopPropagation={() =>
-                                        clickPlan(text)}
-                                    class="plan"
-                                    style="top: {top * 100}%; bottom: {bottom *
-                                        100}%; width: {width *
-                                        100}%; background: {getPseudoRandomColor(
-                                        text
-                                    )}"
-                                >
-                                    {text}
-                                </div>
+                                {#if top < 1 && bottom < 1}
+                                    <div
+                                        on:click|stopPropagation={() =>
+                                            clickPlan(text)}
+                                        class="plan"
+                                        style="top: {top *
+                                            100}%; bottom: {bottom *
+                                            100}%; width: calc({width *
+                                            100}% - 0.5rem); background: {getPseudoRandomColor(
+                                            text
+                                        )}"
+                                    >
+                                        {text}
+                                    </div>
+                                {/if}
                             {/each}
                         </div>
                     {/each}
@@ -320,7 +326,7 @@
             font-size: 3vmin;
         }
 
-        .calendar-header {
+        &__header {
             display: flex;
             flex-flow: row;
 
@@ -347,11 +353,15 @@
             }
         }
 
-        .calendar__body {
+        &__body {
+            margin: 1rem 0;
+            border-top: 0.2vmin solid $s-color-light;
+            border-bottom: 0.2vmin solid $s-color-light;
             display: flex;
             flex-flow: row;
 
             .hours {
+                padding: 1rem 0;
                 width: 15vmin;
                 @media (min-width: 800px) {
                     width: 10vmin;
@@ -361,6 +371,7 @@
                     margin: 1vmin;
                     text-align: center;
                     font-size: 3.5vmin;
+                    min-height: 2rem;
                     @media (min-width: 800px) {
                         font-size: 2.5vmin;
                     }
@@ -374,12 +385,12 @@
                 flex-flow: row;
 
                 .day {
+                    padding: 1rem 0.5rem 1rem 0;
                     flex: 1;
                     border-left: 0.2vmin solid $s-color-light;
                     text-align: center;
                     margin-left: 0.2vmin;
                     margin-right: 0.2vmin;
-                    padding: 2.5vmin;
                     justify-content: space-between;
                     align-items: stretch;
 
@@ -388,9 +399,14 @@
                         position: relative;
 
                         .plan {
+                            padding: 0.2rem;
+                            border-radius: 0.5rem;
                             background-color: aqua;
                             position: absolute;
-                            width: 100%;
+                            transform: translate(0.5rem);
+                            overflow: hidden;
+                            white-space: nowrap;
+                            text-overflow: ellipsis;
                         }
                     }
                 }
