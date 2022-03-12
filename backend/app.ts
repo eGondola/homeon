@@ -7,6 +7,9 @@ import cookieSession from "cookie-session";
 import http from "http";
 import { Server } from "socket.io";
 import axios from "axios";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 main();
 
@@ -80,7 +83,7 @@ async function main() {
     app.use(
         cookieSession({
             name: "session",
-            keys: ["a"],
+            keys: [process.env.SESSION_SECRET!],
         })
     );
     const database = await getDatabase();

@@ -3,9 +3,11 @@
 1. Make sure you have run `git lfs install` before
 2. Clone
 3. `npm i`
+4. Create file .env with: `SESSION_SECRET=<secret>`, where `<secret>` is an unguessable secret string
 ## Development
-1. `npm run dev`
-2. Open `localhost:3000` in the browser
+1. Make sure you have MongoDB running
+2. `npm run dev`
+3. Open `localhost:3000` in the browser
 
 ## Database
 
