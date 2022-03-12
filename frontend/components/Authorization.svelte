@@ -68,11 +68,13 @@
                 display: flex;
                 flex-flow: column;
                 align-items: center;
+                justify-content: space-between;
+                padding-bottom: 4vmin;
             }
 
             button {
                 border: none;
-                border-radius: 4vmin;
+                border-radius: 2vmin;
 
                 padding: 3vmin 7.5vmin;
                 margin: 1vmin;
@@ -80,7 +82,7 @@
                 box-shadow: -0.5vmin -0.5vmin 1vmin 0vmin #00000040,
                     0.5vmin 0.5vmin 1vmin 0vmin #00000040;
 
-                background-color: $s-color-dark + e6;
+                background-color: $s-color-dark;
                 color: #ffffffe6;
                 font-size: 4vmin;
             }
