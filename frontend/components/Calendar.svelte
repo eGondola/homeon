@@ -320,6 +320,7 @@
     @import "../styles/variables.scss";
 
     .calendar {
+        padding-top: 2rem;
         font-size: 5vmin;
 
         @media (min-width: 800px) {
@@ -327,6 +328,7 @@
         }
 
         &__header {
+            border-top: 0.2vmin solid $s-color-light;
             display: flex;
             flex-flow: row;
 
@@ -336,6 +338,9 @@
                     width: 10vmin;
                 }
                 text-align: center;
+                display: flex;
+                flex-flow: column;
+                justify-content: center;
             }
 
             .days-header {
@@ -345,16 +350,16 @@
                 justify-content: center;
                 text-align: center;
 
-                @media (min-width: 800px) {
-                    > div {
-                        flex: 1;
-                    }
+                > .day-header {
+                    padding-top: 1rem;
+                    padding-bottom: 1rem;
+                    border-left: 0.2vmin solid $s-color-light;
+                    flex: 1;
                 }
             }
         }
 
         &__body {
-            margin: 1rem 0;
             border-top: 0.2vmin solid $s-color-light;
             border-bottom: 0.2vmin solid $s-color-light;
             display: flex;
@@ -389,8 +394,6 @@
                     flex: 1;
                     border-left: 0.2vmin solid $s-color-light;
                     text-align: center;
-                    margin-left: 0.2vmin;
-                    margin-right: 0.2vmin;
                     justify-content: space-between;
                     align-items: stretch;
 
