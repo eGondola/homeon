@@ -1,4 +1,4 @@
-import express, { response } from "express";
+import express from "express";
 import path from "path";
 import { getDatabase } from "./database";
 import bcrypt from "bcryptjs";
@@ -6,8 +6,7 @@ import { nanoid } from "nanoid";
 import cookieSession from "cookie-session";
 import http from "http";
 import { Server } from "socket.io";
-import { send } from "process";
-import axios from "axios"
+import axios from "axios";
 
 main();
 
@@ -15,51 +14,66 @@ async function main() {
     const app = express();
     const server = http.createServer(app);
     const io = new Server(server);
-    io.on("connection", socket => {
-        socket.on("newGroup", newGroup => {
-            socket.rooms.forEach(room => {
+
+    io.on("connection", (socket) => {
+        socket.on("newGroup", (newGroup) => {
+            socket.rooms.forEach((room) => {
                 socket.leave(room);
-            })
+            });
             socket.join(newGroup?.token);
-        })
-        socket.on("newPosition", async obj => {
+        });
+        socket.on("newPosition", async (obj) => {
             let url = `https://api.opencagedata.com/geocode/v1/json?q=${obj.position.x}+${obj.position.y}&key=6f9855f0d9d04be3b7d02f810a09b3ca`;
             let street = (await axios.get(url)).data.results[0].formatted;
-            await database.users.updateOne({login: obj.user.login, email: obj.user.email}, 
-                {$set: {position: obj.position, time: obj.time, street: street}})
-            io.to(obj.group.token).emit("position", await GetPositions(obj.group.token));
-        })
-        socket.on("getPositions", async group => {
-            io.to(group.token).emit("position", await GetPositions(group.token));
-        })
-    })
-    async function GetPositions(token: string)
-    {
-        interface position {
-            x: Number,
-            y: Number
+            await database.users.updateOne(
+                { login: obj.user.login, email: obj.user.email },
+                {
+                    $set: {
+                        position: obj.position,
+                        time: obj.time,
+                        street: street,
+                    },
+                }
+            );
+            io.to(obj.group.token).emit(
+                "position",
+                await getPositions(obj.group.token)
+            );
+        });
+        socket.on("getPositions", async (group) => {
+            io.to(group.token).emit(
+                "position",
+                await getPositions(group.token)
+            );
+        });
+    });
+    async function getPositions(token: string) {
+        interface Position {
+            x: number;
+            y: number;
         }
-        interface pos {
-            login: string,
-            position: position,
-            street: string,
-            time: number
+
+        interface Pos {
+            login: string;
+            position: Position;
+            street: string;
+            time: number;
         }
-        let users = await database.users.find({groups: token}).toArray();
-        let positions:pos[] = [];
-        for(const user of users)
-        {
-            positions.push({position: user?.position, login: user?.login, street: user?.street, time: user?.time});
+
+        let users = await database.users.find({ groups: token }).toArray();
+        let positions: Pos[] = [];
+        for (const user of users) {
+            positions.push({
+                position: user?.position,
+                login: user?.login,
+                street: user?.street,
+                time: user?.time,
+            });
         }
-            
+
         return positions;
     }
-    
-    
-    /*async function GetList(token: string)
-    {
-        io.to(token).emit("List", )        
-    }*/
+
     app.use(express.static("frontend/public"));
     app.use(express.text());
     app.use(express.json());
@@ -71,9 +85,8 @@ async function main() {
     );
     const database = await getDatabase();
 
-    async function UpdateRooms(token: string)
-    {
-        io.to(token).emit("Group", await database.groups.findOne({token}))
+    async function updateRooms(token: string) {
+        io.to(token).emit("Group", await database.groups.findOne({ token }));
     }
 
     app.get("/api/checkLogin", (req, res) => {
@@ -93,7 +106,7 @@ async function main() {
         if (await confirm(req)) {
             next();
         } else {
-            res.send("beka z ciebie");
+            res.send("Zły token");
         }
     });
 
@@ -151,12 +164,12 @@ async function main() {
         res.send();
     });
 
-    app.get("/group/:token", (req, res) => {
+    app.get("/group/:token", (req, res, next) => {
         database.users.updateOne(
             { login: req.session?.user.login },
             { $push: { groups: req.params.token } }
         );
-        res.sendFile(path.resolve("frontend/public/index.html"));
+        next();
     });
 
     app.get("*", (req, res) => {
@@ -164,71 +177,60 @@ async function main() {
     });
 
     app.post("/shopping-list", async (req, res) => {
-        //let list = await database.list.find({}).toArray();
         let group = await database.groups.findOne({ token: req.body.token });
         res.send(group?.list);
     });
 
     app.post("/updateList", async (req, res) => {
-        //error
-        //database.list.drop();
         let [list, group] = JSON.parse(req.body);
         if (JSON.parse(req.body).length > 0)
             await database.groups.updateOne(
                 { token: group.token },
                 { $set: { list: list } }
             );
-        UpdateRooms(group.token);
-        //database.list.insertMany(JSON.parse(req.body));
+        updateRooms(group.token);
 
         res.send();
     });
 
     app.post("/api/remove-plan", async (req, res) => {
-        let group = await database.groups.findOne({token: req.body[0]});
+        let group = await database.groups.findOne({ token: req.body[0] });
         let plans = group?.plans;
-        let newPlans:any = [];
-        plans?.forEach(plan => {
-            if(plan.text != req.body[1].text)
-                newPlans.push(plan)
-        })
-        database.groups.updateOne({token: req.body[0]}, {$set: {plans: newPlans}})
-        UpdateRooms(req.body[0])
+        let newPlans: any = [];
+        plans?.forEach((plan) => {
+            if (plan.text != req.body[1].text) newPlans.push(plan);
+        });
+        database.groups.updateOne(
+            { token: req.body[0] },
+            { $set: { plans: newPlans } }
+        );
+        updateRooms(req.body[0]);
         res.send();
-    })
+    });
 
     // lights
     app.post("/add-light", async (req, res) => {
-        database.light.updateOne({ name: "check" }, {$set: { check: true }})
+        database.light.updateOne({ name: "check" }, { $set: { check: true } });
         res.send();
     });
 
     app.post("/check-add-light", async (req, res) => {
-        let isset = await database.light.findOne({ name: "check" })
-        res.send(isset?.isset)
+        let isset = await database.light.findOne({ name: "check" });
+        res.send(isset?.isset);
     });
 
     app.post("/get-lights", async (req, res) => {
-        let lights = await database.light.findOne({ name: "lights" })
+        let lights = await database.light.findOne({ name: "lights" });
         res.send(lights?.lights);
     });
 
     app.post("/edit-lights", async (req, res) => {
-        database.light.updateOne({ name: "lights" }, {$set: { lights: JSON.parse(req.body)}})
+        database.light.updateOne(
+            { name: "lights" },
+            { $set: { lights: JSON.parse(req.body) } }
+        );
         res.send();
     });
-
-    /*app.post("/addToList", async (req, res) => {
-        let last: any = await database.list
-            .find({})
-            .sort({ _id: -1 })
-            .limit(1)
-            .toArray();
-        last = last[0] ? last[0].id : 0;
-        let d = JSON.parse(req.body);
-        let obj = { id: last + 1, text: d.text, count: d.count };
-        database.list.insertOne(obj);
-    });*/
 
     server.listen(process.env.PORT || 3000);
 
@@ -249,9 +251,9 @@ async function main() {
                 email: req.body.email,
                 confirmEmailToken,
                 groups: [personalGroupToken],
-                position: {x: 0, y: 0},
+                position: { x: 0, y: 0 },
                 time: 0,
-                street: ""
+                street: "",
             }),
             database.groups.insertOne({
                 name: "Osobiste",
