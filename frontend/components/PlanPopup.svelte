@@ -1,6 +1,6 @@
 <script type="ts">
     import Popup from "./Popup";
-    import { makeDateText } from "../util/date";
+    import { makeDateText, padZero } from "../util/date";
 
     export let removePlan: (plan: Plan) => Promise<void>;
     export let closePopup: () => void;
@@ -30,9 +30,9 @@
         </div>
 
         {makeDateText(start)}
-        {start.getHours()}:{start.getMinutes()} -
+        {padZero(start.getHours())}:{padZero(start.getMinutes())} -
         {makeDateText(end)}
-        {end.getHours()}:{end.getMinutes()}<br />
+        {padZero(end.getHours())}:{padZero(end.getMinutes())}<br />
         {text}
     </div>
 </Popup>
