@@ -8,6 +8,7 @@
         getMonday,
         isSameDate,
         makeDateText,
+        padZero,
     } from "../util/date";
     import type { Group, SerializedPlan } from "../../common/types";
     import AddPlanPopup from "./AddPlanPopup.svelte";
@@ -174,11 +175,7 @@
     }
 
     function generateHours() {
-        const hours: string[] = [];
-        for (let i = 0; i < 24; i++) {
-            hours.push(i > 12 ? i - 12 + ` PM` : i + ` AM`);
-        }
-        return hours;
+        return Array.from({ length: 24 }, (_, i) => `${padZero(i)}:00`);
     }
 
     function getPseudoRandomColor(text: string) {
