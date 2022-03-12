@@ -1,7 +1,3 @@
-<svelte:head>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyABA_utwjiBnqR4aUOIbCTieCBZO7gryKM">
-</script>
-</svelte:head>
 <script context="module" type="ts">
     declare const io: typeof import("socket.io-client").io;
 </script>
@@ -34,10 +30,10 @@
         currentGroup.set(group);
     });
 
-    socket.on("position", obj => {
+    socket.on("position", (obj) => {
         positions.set(obj);
         console.log(obj);
-    })
+    });
 
     currentGroup.subscribe((newGroup) => {
         socket.emit("newGroup", newGroup);
@@ -51,26 +47,35 @@
     const d = new Date();
 
     navigator.geolocation.watchPosition(
-    pos => {
-        let obj = {
-            user: $user, 
-            position: {x: pos.coords.latitude, y: pos.coords.longitude},
-            time: d.getTime(),
-            group: $currentGroup
-        };
-        socket.emit("newPosition", obj)
-    },
-    err => {
-        let obj = {
-            user: $user,
-            positions: err.message,
-            time: d.getTime(),
-            groups, $currentGroup
+        (pos) => {
+            let obj = {
+                user: $user,
+                position: { x: pos.coords.latitude, y: pos.coords.longitude },
+                time: d.getTime(),
+                group: $currentGroup,
+            };
+            socket.emit("newPosition", obj);
+        },
+        (err) => {
+            let obj = {
+                user: $user,
+                positions: err.message,
+                time: d.getTime(),
+                groups,
+                $currentGroup,
+            };
+            socket.emit("newPosition", obj);
         }
-        socket.emit("newPosition", obj);
-    }
     );
 </script>
+
+<svelte:head>
+    <script
+        async
+        defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyABA_utwjiBnqR4aUOIbCTieCBZO7gryKM">
+    </script>
+</svelte:head>
 
 {#if editProfile}
     <div id="profile_menage">
@@ -131,13 +136,6 @@
                 <Groups groups={$groupsStore} />
             {/if}
             <Route path="/">
-                <div class="info-block">
-                    <div>
-                        <div />
-                        <div />
-                    </div>
-                </div>
-
                 <div class="navigation">
                     <div>
                         <div>
@@ -179,7 +177,7 @@
             <Route path="/shopping-list">
                 <List />
             </Route>
-            
+
             <Route path="/household-duties">
                 <Localization />
             </Route>
@@ -323,28 +321,6 @@
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                }
-            }
-        }
-
-        .info-block {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            > div {
-                flex: 1;
-                display: flex;
-                flex-flow: column;
-
-                height: 40vmin;
-                > div {
-                    flex: 1;
-                    margin: 1vmin 4vmin 1vmin;
-
-                    border-radius: 2vmin;
-                    background-color: $p-color;
                 }
             }
         }
