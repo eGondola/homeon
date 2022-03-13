@@ -49,7 +49,9 @@ async function main() {
                 await getPositions(group.token)
             );
         });
-
+        socket.on("setHome", async (obj) => {
+            await database.groups.updateOne({ token: obj.group.token }, { $set: {home: {x: obj.lat, y: obj.lng}}})
+        })
 
         // lights
         socket.on("sendToAvr", command => {
@@ -99,6 +101,11 @@ async function main() {
         io.to(token).emit("Group", await database.groups.findOne({ token }));
     }
 
+    /*app.post("/setHome", (req, res) => {
+        console.log(req.body)
+        res.send();
+    });*/
+
     app.get("/api/checkLogin", (req, res) => {
         res.send(req.session?.user ?? {});
     });
@@ -134,6 +141,7 @@ async function main() {
             token,
             plans: [],
             list: [],
+            home: null
         });
         database.users.updateOne(
             { login: req.session?.user.login },
@@ -277,6 +285,7 @@ async function main() {
                 token: personalGroupToken,
                 plans: [],
                 list: [],
+                home: null
             }),
         ]);
 

@@ -50,20 +50,32 @@
             {item.text}
             <br />
         </p>
+        <input type="checkbox" class="checkbox">
     </div>
 {/each}
 <div class="input-group">
     <div>Nazwa: <input type="text" bind:value={text} /></div>
     <div>Sztuki: <input type="number" bind:value={count} /></div>
     <input type="submit" on:click={sendForm} id="submit" />
+    
 </div>
 {message}
 
 <style>
+    .text-display {
+        text-align: center;
+        margin-left: 40px;
+    }
+
+    .checkbox {
+        width: 30px;
+        height: 30px;
+    }
+
     .num-display {
         position: absolute;
-        top: -10px;
-        left: -10px;
+        left: -5px;
+        top: -3px;
         width: 50px;
         height: 50px;
         background: #546e7a;
@@ -88,8 +100,8 @@
         background-color: #c63f17;
         color: rgb(233, 233, 255);
         border-radius: 15px;
-        padding: 40px 50px;
-        margin: 20px 0;
+        padding: 25px 10px;
+        margin: 5px 0;
         position: relative;
     }
 

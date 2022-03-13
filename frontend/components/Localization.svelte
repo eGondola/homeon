@@ -17,6 +17,9 @@
       }
     </style>
 </svelte:head>
+<script context="module" type="ts">
+    declare const io: typeof import("socket.io-client").io;
+</script>
 <script type="ts">
     import type { Writable } from "svelte/store";
     import { getContext, onMount } from "svelte";
@@ -30,12 +33,16 @@
     Date.prototype.timeNow = function() {
         return ((this.getHours() < 10)?"0":"") + this.getHours() +":"+ ((this.getMinutes() < 10)?"0":"") + this.getMinutes() +":"+ ((this.getSeconds() < 10)?"0":"") + this.getSeconds();
     }
-
+    const socket = io();
     const user = getContext<Writable<User>>("user");
     const positions = getContext<Writable<position[]>>("positions");
+    const currentGroup = getContext<Writable<any>>("group");
     let markers: Array<MarkerWithLabel> = [];
     let actualPosition = $positions.find(e => e.login == $user.login);
     var map:any;
+    var setHome:boolean = false;
+    var homePosition:position;
+    var homeMarker:any;
     async function initMap() {
         var latLng = new google.maps.LatLng(actualPosition?.position.x, actualPosition?.position.y);
         //var homeLatLng = new google.maps.LatLng(49.47805, -123.84716);
@@ -47,7 +54,51 @@
         });
         AddMarkers(map);
         
+        google.maps.event.addListener(map, 'click', OnMapClick);
+
+        AddHomeMarker()
     }
+
+    async function AddHomeMarker()
+    {
+        homeMarker?.setMap(null);
+        if($currentGroup.home)
+        {
+            homeMarker = new MarkerWithLabel({
+                position: new google.maps.LatLng($currentGroup.home.x, $currentGroup.home.y),
+                clickable: false,
+                draggable: false,
+                map: map,
+                labelContent: "Dom",
+                labelAnchor: new google.maps.Point(-21, 3),
+                labelClass: "labels", // the CSS class for the label
+                labelStyle: { opacity: 1.0 },
+            });
+        }
+    }
+
+    function OnMapClick(event:any){
+            if(setHome == true)
+            {
+                console.log(event.latLng.lat(), event.latLng.lng())
+                homeMarker?.setMap(null);
+                homePosition = event.latLng;
+                homeMarker = new MarkerWithLabel({
+                    position: homePosition,
+                    clickable: false,
+                    draggable: false,
+                    map: map,
+                    labelContent: "Dom",
+                    labelAnchor: new google.maps.Point(-21, 3),
+                    labelClass: "labels", // the CSS class for the label
+                    labelStyle: { opacity: 1.0 },
+                });
+                $currentGroup.home = {x: event.latLng.lat(), y: event.latLng.lng()}
+                //fetch("/setHome", {method: "POST", body: JSON.stringify({lat: event.latLng.lat(), lng: event.latLng.lng()})})
+                socket.emit("setHome", {lat: event.latLng.lat(), lng: event.latLng.lng(), group: $currentGroup})
+                setHome = false;
+            }
+        }
 
     function AddMarkers(map:any)
     {
@@ -71,7 +122,7 @@
         })
     }
 
-    $: { $positions, AddMarkers(map) }
+    $: { $positions, AddMarkers(map), AddHomeMarker() }
 
     onMount(() => {
         initMap();
@@ -89,6 +140,7 @@
         <br>
     </div>
 {/each}
+<button on:click={() => setHome = true}>Dom</button>
 <style>
     #map {
         width: 100%;

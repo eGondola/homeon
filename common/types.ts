@@ -3,6 +3,7 @@ export type Group = {
     token: string;
     plans: SerializedPlan[];
     list: ListItem[];
+    home: pos | null;
 };
 
 export type SerializedPlan = {
@@ -19,13 +20,14 @@ export type User = {
 
 export type position = {
     login: string,
-    position: {
-        x: number,
-        y: number
-    },
+    position: pos
     time: number,
     street: string
 };
+type pos = {
+    x: number,
+    y: number,
+}
 
 type ListItem = {
     text: string;
