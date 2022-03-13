@@ -49,6 +49,13 @@ async function main() {
                 await getPositions(group.token)
             );
         });
+
+
+        // lights
+        socket.on("sendToAvr", command => {
+            //database.light.updateOne({ name: "lights" }, {$set: { lights: JSON.parse(command)}})
+            io.send(command);
+        })
     });
     async function getPositions(token: string) {
         interface Position {
@@ -212,26 +219,33 @@ async function main() {
     });
 
     // lights
+    app.post("/get-lights", async (req, res) => {
+        let lights = await database.light.findOne({ name: "lights" })
+        res.send(lights?.lights);
+    });
+    
     app.post("/add-light", async (req, res) => {
-        database.light.updateOne({ name: "check" }, { $set: { check: true } });
+        //database.light.updateOne({ name: "check" }, {$set: { check: true }})
+        console.log(req.body)
+        database.light.updateOne({name: "lights"}, {$push: { lights: { id: parseInt(req.body), name: "new", work: false }}})
         res.send();
     });
 
-    app.post("/check-add-light", async (req, res) => {
-        let isset = await database.light.findOne({ name: "check" });
-        res.send(isset?.isset);
+    app.post("/switch-light", async (req, res) => {
+        database.light.updateOne({ name: "lights", "lights.id": parseInt(req.body.split("|")[0]) }, {$set: { "lights.$.work": req.body.split("|")[1] == "ON" ? true : false}})
+        res.send();
     });
 
-    app.post("/get-lights", async (req, res) => {
-        let lights = await database.light.findOne({ name: "lights" });
-        res.send(lights?.lights);
+    app.post("/remove-light", async (req, res) => {
+        console.log(req.body)
+        database.light.updateOne({ name: "lights" }, {$pull: { lights: { id: JSON.parse(req.body) }}})
+        res.send();
     });
 
     app.post("/edit-lights", async (req, res) => {
-        database.light.updateOne(
-            { name: "lights" },
-            { $set: { lights: JSON.parse(req.body) } }
-        );
+        let { id, name } = JSON.parse(req.body)
+
+        database.light.updateOne({ name: "lights", "lights.id": parseInt(id) }, {$set: { "lights.$.name": name}})
         res.send();
     });
 

@@ -1,66 +1,127 @@
+<script context="module" type="ts">
+    declare const io: typeof import("socket.io-client").io;
+</script>
 <script type="ts">
+    const socket = io();
+
     let lights: any = { 0: {} };
-    fetch("/get-lights", {
-        method: "POST",
-    })
-        .then((odp) => odp.json())
-        .then((v) => {
-            lights = v;
-
-            Object.values(lights).forEach((light: any, key) => {
-                name[key] = {
-                    name: light.name,
-                    work: light.work,
-                };
-            });
-        });
-
-    let search = false;
-    function addLight() {
-        search = true;
-        fetch("/add-light", {
+    function getLights() {
+        fetch("/get-lights", {
             method: "POST",
-        });
+        })
+            .then((odp) => odp.json())
+            .then((v) => {
+                lights = v;
 
-        let checkLight = setInterval(() => {
-            fetch("/check-add-light", {
-                method: "POST",
-            })
-                .then((odp) => odp.json())
-                .then((v) => {
-                    if (v) {
-                        console.log("get");
-                        clearInterval(checkLight);
+                Object.values(lights).forEach((light: any, key) => {
+                    allLights[key] = {
+                        id: light.id,
+                        name: light.name,
+                        work: light.work,
+                    };
 
-                        fetch("/get-lights", {
-                            method: "POST",
-                        })
-                            .then((odp) => odp.json())
-                            .then((v) => {
-                                lights = v;
-                            });
-
-                        search = false;
-                    }
+                    allLightsNames[key] = light.name
                 });
-        }, 2000);
+            });
     }
+    getLights()
+
+
+    function addLight() {
+        fetch("/get-lights", {
+            method: "POST",
+        })
+            .then((odp) => odp.json())
+            .then((lights) => {
+                console.log(lights)
+                let newLightId: any = parseInt(lights[lights.length-1].id) + 1
+                socket.emit("sendToAvr", "0|SET|" + newLightId);
+
+                fetch("/add-light", {
+                    method: "POST",
+                    body: newLightId,
+                })
+
+                getLights()
+            });
+    }
+
+    function onOffLight(lightId: number, onOff: boolean) {
+        let switchLight = lightId + "|" + (onOff ? "ON" : "OFF")
+        
+        fetch("/switch-light", {
+            method: "POST",
+            body: switchLight,
+        })
+        socket.emit("sendToAvr", switchLight);
+    }
+
+    function resetLight(lightId: any) {
+        console.log(lightId)
+        fetch("/remove-light", {
+            method: "POST",
+            body: lightId,
+        })
+
+        socket.emit("sendToAvr", lightId + "|SET|0");
+
+        getLights()
+    }
+
 
     let editLightSwitch = false;
 
-    let name: any = [Object.values(lights).length];
+    let allLights: any = [Object.values(lights).length];
+    let allLightsNames: any = [Object.values(lights).length];
 
     function editLight() {
-        fetch("/edit-lights", {
-            method: "POST",
-            body: JSON.stringify(name),
-        });
+        console.log(allLights)
+        allLights.forEach((light: any, key: number) => {
+            if(light.name !=  allLightsNames[key]) {
+                fetch("/edit-lights", {
+                    method: "POST",
+                    body: JSON.stringify({id: light.id, name: light.name}),
+                });
+            }
+        })
+
+        getLights()
     }
 </script>
 
 <div id="all">
     <div>
+        {#each Object.values(lights) as light, key}
+            <div class="light">
+                <div class="title">
+                    {#if !editLightSwitch}
+                        {allLights[key].name}
+                    {:else}
+                        <input type="text" bind:value={allLights[key].name} />
+                    {/if}
+                </div>
+                {#if editLightSwitch}
+                    <div on:click="{() => {resetLight(allLights[key].id)}}"><i class="icon-x" /></div>
+                {/if}
+                {#if !editLightSwitch}
+                    <div class="light_switch">
+                        <input
+                            type="checkbox"
+                            id="switch{key}"
+                            class="switch"
+                            bind:checked={allLights[key].work}
+                            on:change={() => {onOffLight(allLights[key].id, allLights[key].work)}}
+                        />
+                        <label for="switch{key}" class="lbl-off">Off</label>
+                        <label for="switch{key}" class="lbl-on">On</label>
+                    </div>
+                {/if}
+            </div>
+        {/each}
+    </div>
+    <div id="add">
         {#if !editLightSwitch}
+            <div on:click={addLight}><i class="icon-plus" /></div>
             <div
                 class="edit"
                 on:click={() => {
@@ -80,38 +141,7 @@
                 <i class="icon-v" />
             </div>
         {/if}
-        {#each Object.values(lights) as light, key}
-            <div class="light">
-                <div class="title">
-                    {#if !editLightSwitch}
-                        {name[key].name}
-                    {:else}
-                        <input type="text" bind:value={name[key].name} />
-                    {/if}
-                </div>
-                {#if !editLightSwitch}
-                    <div class="light_switch">
-                        <input
-                            type="checkbox"
-                            id="switch{key}"
-                            class="switch"
-                            bind:checked={name[key].work}
-                            on:change={editLight}
-                        />
-                        <label for="switch{key}" class="lbl-off">Off</label>
-                        <label for="switch{key}" class="lbl-on">On</label>
-                    </div>
-                {/if}
-            </div>
-        {/each}
     </div>
-    {#if search}
-        <div id="load"><i class="icon-load animate-spin" /></div>
-    {:else}
-        <div id="add" on:click={addLight}>
-            <div><i class="icon-plus" /></div>
-        </div>
-    {/if}
 </div>
 
 <style lang="scss">
@@ -137,15 +167,15 @@
             align-items: end;
             justify-content: center;
 
-            .edit {
-                position: absolute;
-                left: 2vmin;
-                background-color: $s-color;
-                color: white;
+            // .edit {
+            //     position: absolute;
+            //     left: 2vmin;
+            //     background-color: $s-color;
+            //     color: white;
 
-                padding: 2vmin;
-                border-radius: 15vmin;
-            }
+            //     padding: 2vmin;
+            //     border-radius: 15vmin;
+            // }
 
             .light {
                 display: flex;
@@ -166,6 +196,19 @@
 
                     font-size: 6vmin;
                     font-variant: small-caps;
+
+                    input {
+                        width: 100%;
+                        border: 1px solid $p-color;
+                        border-radius: 2vmin;
+                        font-size: 5vmin;
+                        padding-left: 1vmin;
+                        padding-right: 1vmin;
+                    }
+
+                    input:focus {
+                        outline: 1px solid white;
+                    }
                 }
 
                 .light_switch {
@@ -264,13 +307,21 @@
 
         #add {
             margin-top: 5vmin;
-            padding: 4vmin;
 
-            border-radius: 15vmin;
+            display: flex;
+            flex-flow: row;
 
-            background-color: $s-color-light;
             color: white;
-            font-size: 4vmin;
+
+            > div {
+                border-radius: 15vmin;
+
+                padding: 4vmin;
+                margin-right: 2vmin;
+                margin-left: 2vmin;
+
+                background-color: $s-color-light;
+            }
         }
 
         #load {
