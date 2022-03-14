@@ -32,4 +32,5 @@ type pos = {
 type ListItem = {
     text: string;
     count: number;
+    checked: boolean;
 };

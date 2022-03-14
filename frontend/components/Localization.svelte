@@ -43,6 +43,22 @@
     var setHome:boolean = false;
     var homePosition:position;
     var homeMarker:any;
+    var rad = function(x:any) {
+        return x * Math.PI / 180;
+    };
+
+    var getDistance = function(p1:any, p2:any) {
+        var R = 6378137; // Earth’s mean radius in meter
+        var dLat = rad(p2.lat() - p1.lat());
+        var dLong = rad(p2.lng() - p1.lng());
+        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(rad(p1.lat())) * Math.cos(rad(p2.lat())) *
+            Math.sin(dLong / 2) * Math.sin(dLong / 2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        var d = R * c;
+        return d; // returns the distance in meter
+    };
+
     async function initMap() {
         var latLng = new google.maps.LatLng(actualPosition?.position.x, actualPosition?.position.y);
         //var homeLatLng = new google.maps.LatLng(49.47805, -123.84716);
@@ -75,6 +91,25 @@
                 labelStyle: { opacity: 1.0 },
             });
         }
+    }
+
+    function IsSomeoneInHome()
+    {
+        let minDistance:any = false;
+        if($currentGroup.home)
+        {
+            minDistance = 100000000;
+            let home = $currentGroup.home;
+            $positions.forEach(position => {
+                let distance = getDistance(
+                    new google.maps.LatLng(home.x, home.y),
+                    new google.maps.LatLng(position.position.x, position.position.y)
+                )
+                minDistance = distance < minDistance ? distance : minDistance;
+            })
+            console.log(minDistance)
+        }
+        return minDistance;    
     }
 
     function OnMapClick(event:any){
@@ -126,6 +161,7 @@
 
     onMount(() => {
         initMap();
+        IsSomeoneInHome();
     });
 </script>
 <div id="map"></div>

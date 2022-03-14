@@ -2,7 +2,7 @@
     import { getContext } from "svelte";
     import type { Writable } from "svelte/store";
 
-    const group = getContext<Writable<any>>("group");
+    //const group = getContext<Writable<any>>("group");
     let text: string;
     let count: number;
     let message: string = "";
@@ -10,7 +10,7 @@
     const currentGroup = getContext<Writable<any>>("group");
 
     function deleteItem(id: number) {
-        $group.list = $group.list.filter((item: any) => {
+        $currentGroup.list = $currentGroup.list.filter((item: any) => {
             return item.id != id;
         });
         updateList();
@@ -18,18 +18,18 @@
     function updateList() {
         fetch("/updateList", {
             method: "POST",
-            body: JSON.stringify([$group.list, $currentGroup]),
+            body: JSON.stringify([$currentGroup.list, $currentGroup]),
         });
     }
 
     function sendForm() {
         if (text.trim().length > 2 && count > 0) {
             let max = 0;
-            for (let i = 0; i < $group.list.length; i++)
-                if (max < $group.list[i].id) max = $group.list[i].id;
+            for (let i = 0; i < $currentGroup.list.length; i++)
+                if (max < $currentGroup.list[i].id) max = $currentGroup.list[i].id;
             max++;
-            $group.list.push({ text: text, count: count, id: max });
-            $group.list = $group.list;
+            $currentGroup.list.push({ text: text, count: count, id: max, checked: false});
+            $currentGroup.list = $currentGroup.list;
             updateList();
             text = "";
             count = 0;
@@ -40,7 +40,7 @@
     }
 </script>
 
-{#each $group.list as item}
+{#each $currentGroup.list as item}
     <div class="card">
         <div class="num-display">
             {item.count}
@@ -50,7 +50,7 @@
             {item.text}
             <br />
         </p>
-        <input type="checkbox" class="checkbox">
+        <input type="checkbox" class="checkbox" on:click={() => {item.checked = !item.checked; updateList();}} checked={item.checked}>
     </div>
 {/each}
 <div class="input-group">
