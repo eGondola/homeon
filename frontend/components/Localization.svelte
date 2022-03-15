@@ -95,10 +95,10 @@
 
     function IsSomeoneInHome()
     {
-        let minDistance:any = false;
+        let minDistance = 100000000;;
         if($currentGroup.home)
         {
-            minDistance = 100000000;
+            
             let home = $currentGroup.home;
             $positions.forEach(position => {
                 let distance = getDistance(
@@ -109,7 +109,10 @@
             })
             console.log(minDistance)
         }
-        return minDistance;    
+        if(minDistance > 25)
+            InHome = "Nie ma nikogo w domu";
+        else
+            InHome = "";
     }
 
     function OnMapClick(event:any){
@@ -156,8 +159,9 @@
             }))
         })
     }
+    let InHome = '';
 
-    $: { $positions, AddMarkers(map), AddHomeMarker() }
+    $: { $positions, AddMarkers(map), AddHomeMarker(), IsSomeoneInHome() }
 
     onMount(() => {
         initMap();
@@ -176,6 +180,7 @@
         <br>
     </div>
 {/each}
+{InHome}
 <button on:click={() => setHome = true}>Dom</button>
 <style>
     #map {
