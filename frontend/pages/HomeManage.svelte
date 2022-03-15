@@ -5,6 +5,20 @@
     const socket = io();
 
     let lights: any = { 0: {} };
+    let editLightSwitch = false;
+
+    let allLights: any = [Object.values(lights).length];
+    let allLightsNames: any = [Object.values(lights).length];
+
+    function lightChange()
+    {
+        socket.emit("light", allLights);
+    }
+    
+    socket.on("light", (data:any) => {
+        allLights = data;
+    })
+
     function getLights() {
         fetch("/get-lights", {
             method: "POST",
@@ -54,6 +68,7 @@
             body: switchLight,
         })
         socket.emit("sendToAvr", switchLight);
+        lightChange();
     }
 
     function resetLight(lightId: any) {
@@ -67,12 +82,6 @@
 
         getLights()
     }
-
-
-    let editLightSwitch = false;
-
-    let allLights: any = [Object.values(lights).length];
-    let allLightsNames: any = [Object.values(lights).length];
 
     function editLight() {
         console.log(allLights)

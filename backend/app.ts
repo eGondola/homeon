@@ -58,6 +58,10 @@ async function main() {
             //database.light.updateOne({ name: "lights" }, {$set: { lights: JSON.parse(command)}})
             io.send(command);
         })
+
+        socket.on("light", (light) => {
+            io.emit("light", light);
+        })
     });
     async function getPositions(token: string) {
         interface Position {
