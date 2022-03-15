@@ -58,6 +58,7 @@
 
                 getLights()
             });
+        lightChange();
     }
 
     function onOffLight(lightId: number, onOff: boolean) {
@@ -79,7 +80,7 @@
         })
 
         socket.emit("sendToAvr", lightId + "|SET|0");
-
+        lightChange();
         getLights()
     }
 
@@ -93,7 +94,7 @@
                 });
             }
         })
-
+        lightChange();
         getLights()
     }
 </script>
