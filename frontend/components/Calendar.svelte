@@ -153,7 +153,6 @@
             let current: Date;
             do {
                 current = addDays(monday, i);
-                console.log(i);
                 dayPlans[i].push({
                     top: isSameDate(current, start)
                         ? getFractionOfDayPassed(start)

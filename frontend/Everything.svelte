@@ -32,7 +32,6 @@
 
     socket.on("position", (obj) => {
         positions.set(obj);
-        console.log(obj);
     });
 
     currentGroup.subscribe((newGroup) => {

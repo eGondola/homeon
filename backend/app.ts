@@ -50,14 +50,16 @@ async function main() {
             );
         });
         socket.on("setHome", async (obj) => {
-            await database.groups.updateOne({ token: obj.group.token }, { $set: {home: {x: obj.lat, y: obj.lng}}})
-        })
+            await database.groups.updateOne(
+                { token: obj.group.token },
+                { $set: { home: { x: obj.lat, y: obj.lng } } }
+            );
+        });
 
         // lights
-        socket.on("sendToAvr", command => {
-            //database.light.updateOne({ name: "lights" }, {$set: { lights: JSON.parse(command)}})
+        socket.on("sendToAvr", (command) => {
             io.send(command);
-        })
+        });
     });
     async function getPositions(token: string) {
         interface Position {
@@ -101,11 +103,6 @@ async function main() {
         io.to(token).emit("Group", await database.groups.findOne({ token }));
     }
 
-    /*app.post("/setHome", (req, res) => {
-        console.log(req.body)
-        res.send();
-    });*/
-
     app.get("/api/checkLogin", (req, res) => {
         res.send(req.session?.user ?? {});
     });
@@ -141,7 +138,7 @@ async function main() {
             token,
             plans: [],
             list: [],
-            home: null
+            home: null,
         });
         database.users.updateOne(
             { login: req.session?.user.login },
@@ -228,32 +225,54 @@ async function main() {
 
     // lights
     app.post("/get-lights", async (req, res) => {
-        let lights = await database.light.findOne({ name: "lights" })
+        let lights = await database.light.findOne({ name: "lights" });
         res.send(lights?.lights);
     });
-    
+
     app.post("/add-light", async (req, res) => {
-        //database.light.updateOne({ name: "check" }, {$set: { check: true }})
-        console.log(req.body)
-        database.light.updateOne({name: "lights"}, {$push: { lights: { id: parseInt(req.body), name: "new", work: false }}})
+        database.light.updateOne(
+            { name: "lights" },
+            {
+                $push: {
+                    lights: {
+                        id: parseInt(req.body),
+                        name: "new",
+                        work: false,
+                    },
+                },
+            }
+        );
         res.send();
     });
 
     app.post("/switch-light", async (req, res) => {
-        database.light.updateOne({ name: "lights", "lights.id": parseInt(req.body.split("|")[0]) }, {$set: { "lights.$.work": req.body.split("|")[1] == "ON" ? true : false}})
+        database.light.updateOne(
+            { name: "lights", "lights.id": parseInt(req.body.split("|")[0]) },
+            {
+                $set: {
+                    "lights.$.work":
+                        req.body.split("|")[1] == "ON" ? true : false,
+                },
+            }
+        );
         res.send();
     });
 
     app.post("/remove-light", async (req, res) => {
-        console.log(req.body)
-        database.light.updateOne({ name: "lights" }, {$pull: { lights: { id: JSON.parse(req.body) }}})
+        database.light.updateOne(
+            { name: "lights" },
+            { $pull: { lights: { id: JSON.parse(req.body) } } }
+        );
         res.send();
     });
 
     app.post("/edit-lights", async (req, res) => {
-        let { id, name } = JSON.parse(req.body)
+        let { id, name } = JSON.parse(req.body);
 
-        database.light.updateOne({ name: "lights", "lights.id": parseInt(id) }, {$set: { "lights.$.name": name}})
+        database.light.updateOne(
+            { name: "lights", "lights.id": parseInt(id) },
+            { $set: { "lights.$.name": name } }
+        );
         res.send();
     });
 
@@ -285,7 +304,7 @@ async function main() {
                 token: personalGroupToken,
                 plans: [],
                 list: [],
-                home: null
+                home: null,
             }),
         ]);
 

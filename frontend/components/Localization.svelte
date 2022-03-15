@@ -1,67 +1,71 @@
-<svelte:head>
-    <style>
-         .labels {
-        color: #ffffff;
-        font-family: Roboto, Arial, sans-serif;
-        font-size: 10px;
-        font-weight: bold;
-        text-align: center;
-        width: 40px;
-        padding: 2px;
-        border: 1px solid #999;
-        box-sizing: border-box;
-        white-space: nowrap;
-        margin: 1vmin;
-        border-radius: 10vmin;
-        background-color: #ff7043;
-      }
-    </style>
-</svelte:head>
 <script context="module" type="ts">
     declare const io: typeof import("socket.io-client").io;
 </script>
+
 <script type="ts">
     import type { Writable } from "svelte/store";
     import { getContext, onMount } from "svelte";
     import type { User, position } from "../../common/types";
-    import { MarkerWithLabel } from '@googlemaps/markerwithlabel';
+    import { MarkerWithLabel } from "@googlemaps/markerwithlabel";
 
-    Date.prototype.today = function() { 
-        return ((this.getDate() < 10)?"0":"") + this.getDate() +"/"+(((this.getMonth()+1) < 10)?"0":"") + (this.getMonth()+1) +"/"+ this.getFullYear();
-    }
+    Date.prototype.today = function () {
+        return (
+            (this.getDate() < 10 ? "0" : "") +
+            this.getDate() +
+            "/" +
+            (this.getMonth() + 1 < 10 ? "0" : "") +
+            (this.getMonth() + 1) +
+            "/" +
+            this.getFullYear()
+        );
+    };
 
-    Date.prototype.timeNow = function() {
-        return ((this.getHours() < 10)?"0":"") + this.getHours() +":"+ ((this.getMinutes() < 10)?"0":"") + this.getMinutes() +":"+ ((this.getSeconds() < 10)?"0":"") + this.getSeconds();
-    }
+    Date.prototype.timeNow = function () {
+        return (
+            (this.getHours() < 10 ? "0" : "") +
+            this.getHours() +
+            ":" +
+            (this.getMinutes() < 10 ? "0" : "") +
+            this.getMinutes() +
+            ":" +
+            (this.getSeconds() < 10 ? "0" : "") +
+            this.getSeconds()
+        );
+    };
     const socket = io();
     const user = getContext<Writable<User>>("user");
     const positions = getContext<Writable<position[]>>("positions");
     const currentGroup = getContext<Writable<any>>("group");
     let markers: Array<MarkerWithLabel> = [];
-    let actualPosition = $positions.find(e => e.login == $user.login);
-    var map:any;
-    var setHome:boolean = false;
-    var homePosition:position;
-    var homeMarker:any;
-    var rad = function(x:any) {
-        return x * Math.PI / 180;
+    let actualPosition = $positions.find((e) => e.login == $user.login);
+    var map: any;
+    var setHome: boolean = false;
+    var homePosition: position;
+    var homeMarker: any;
+    var rad = function (x: any) {
+        return (x * Math.PI) / 180;
     };
 
-    var getDistance = function(p1:any, p2:any) {
+    var getDistance = function (p1: any, p2: any) {
         var R = 6378137; // Earth’s mean radius in meter
         var dLat = rad(p2.lat() - p1.lat());
         var dLong = rad(p2.lng() - p1.lng());
-        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(rad(p1.lat())) * Math.cos(rad(p2.lat())) *
-            Math.sin(dLong / 2) * Math.sin(dLong / 2);
+        var a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(rad(p1.lat())) *
+                Math.cos(rad(p2.lat())) *
+                Math.sin(dLong / 2) *
+                Math.sin(dLong / 2);
         var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        var d = R * c;
-        return d; // returns the distance in meter
+        var distanceInMeters = R * c;
+        return distanceInMeters;
     };
 
     async function initMap() {
-        var latLng = new google.maps.LatLng(actualPosition?.position.x, actualPosition?.position.y);
-        //var homeLatLng = new google.maps.LatLng(49.47805, -123.84716);
+        var latLng = new google.maps.LatLng(
+            actualPosition?.position.x,
+            actualPosition?.position.y
+        );
 
         map = new google.maps.Map(document.getElementById("map"), {
             zoom: 12,
@@ -69,114 +73,146 @@
             mapTypeId: google.maps.MapTypeId.ROADMAP,
         });
         AddMarkers(map);
-        
-        google.maps.event.addListener(map, 'click', OnMapClick);
 
-        AddHomeMarker()
+        google.maps.event.addListener(map, "click", OnMapClick);
+
+        AddHomeMarker();
     }
 
-    async function AddHomeMarker()
-    {
+    async function AddHomeMarker() {
         homeMarker?.setMap(null);
-        if($currentGroup.home)
-        {
+        if ($currentGroup.home) {
             homeMarker = new MarkerWithLabel({
-                position: new google.maps.LatLng($currentGroup.home.x, $currentGroup.home.y),
+                position: new google.maps.LatLng(
+                    $currentGroup.home.x,
+                    $currentGroup.home.y
+                ),
                 clickable: false,
                 draggable: false,
                 map: map,
                 labelContent: "Dom",
                 labelAnchor: new google.maps.Point(-21, 3),
-                labelClass: "labels", // the CSS class for the label
+                labelClass: "labels",
                 labelStyle: { opacity: 1.0 },
             });
         }
     }
 
-    function IsSomeoneInHome()
-    {
-        let minDistance:any = false;
-        if($currentGroup.home)
-        {
+    function IsSomeoneInHome() {
+        let minDistance: any = false;
+        if ($currentGroup.home) {
             minDistance = 100000000;
             let home = $currentGroup.home;
-            $positions.forEach(position => {
+            $positions.forEach((position) => {
                 let distance = getDistance(
                     new google.maps.LatLng(home.x, home.y),
-                    new google.maps.LatLng(position.position.x, position.position.y)
-                )
+                    new google.maps.LatLng(
+                        position.position.x,
+                        position.position.y
+                    )
+                );
                 minDistance = distance < minDistance ? distance : minDistance;
-            })
-            console.log(minDistance)
+            });
         }
-        return minDistance;    
+        return minDistance;
     }
 
-    function OnMapClick(event:any){
-            if(setHome == true)
-            {
-                console.log(event.latLng.lat(), event.latLng.lng())
-                homeMarker?.setMap(null);
-                homePosition = event.latLng;
-                homeMarker = new MarkerWithLabel({
-                    position: homePosition,
-                    clickable: false,
-                    draggable: false,
-                    map: map,
-                    labelContent: "Dom",
-                    labelAnchor: new google.maps.Point(-21, 3),
-                    labelClass: "labels", // the CSS class for the label
-                    labelStyle: { opacity: 1.0 },
-                });
-                $currentGroup.home = {x: event.latLng.lat(), y: event.latLng.lng()}
-                //fetch("/setHome", {method: "POST", body: JSON.stringify({lat: event.latLng.lat(), lng: event.latLng.lng()})})
-                socket.emit("setHome", {lat: event.latLng.lat(), lng: event.latLng.lng(), group: $currentGroup})
-                setHome = false;
-            }
+    function OnMapClick(event: any) {
+        if (setHome == true) {
+            homeMarker?.setMap(null);
+            homePosition = event.latLng;
+            homeMarker = new MarkerWithLabel({
+                position: homePosition,
+                clickable: false,
+                draggable: false,
+                map: map,
+                labelContent: "Dom",
+                labelAnchor: new google.maps.Point(-21, 3),
+                labelClass: "labels",
+                labelStyle: { opacity: 1.0 },
+            });
+            $currentGroup.home = {
+                x: event.latLng.lat(),
+                y: event.latLng.lng(),
+            };
+            socket.emit("setHome", {
+                lat: event.latLng.lat(),
+                lng: event.latLng.lng(),
+                group: $currentGroup,
+            });
+            setHome = false;
         }
+    }
 
-    function AddMarkers(map:any)
-    {
-        for(const marker of markers)
-        {
+    function AddMarkers(map: any) {
+        for (const marker of markers) {
             marker.setMap(null);
         }
         markers = [];
 
-        $positions.forEach(obj => {
-            markers.push(new MarkerWithLabel({
-                position: new google.maps.LatLng(obj.position.x, obj.position.y),
-                clickable: false,
-                draggable: false,
-                map: map,
-                labelContent: obj.login,
-                labelAnchor: new google.maps.Point(-21, 3),
-                labelClass: "labels", // the CSS class for the label
-                labelStyle: { opacity: 1.0 },
-            }))
-        })
+        $positions.forEach((obj) => {
+            markers.push(
+                new MarkerWithLabel({
+                    position: new google.maps.LatLng(
+                        obj.position.x,
+                        obj.position.y
+                    ),
+                    clickable: false,
+                    draggable: false,
+                    map: map,
+                    labelContent: obj.login,
+                    labelAnchor: new google.maps.Point(-21, 3),
+                    labelClass: "labels",
+                    labelStyle: { opacity: 1.0 },
+                })
+            );
+        });
     }
 
-    $: { $positions, AddMarkers(map), AddHomeMarker() }
+    $: {
+        $positions, AddMarkers(map), AddHomeMarker();
+    }
 
     onMount(() => {
         initMap();
         IsSomeoneInHome();
     });
 </script>
-<div id="map"></div>
+
+<svelte:head>
+    <style>
+        .labels {
+            color: #ffffff;
+            font-family: Roboto, Arial, sans-serif;
+            font-size: 10px;
+            font-weight: bold;
+            text-align: center;
+            width: 40px;
+            padding: 2px;
+            border: 1px solid #999;
+            box-sizing: border-box;
+            white-space: nowrap;
+            margin: 1vmin;
+            border-radius: 10vmin;
+            background-color: #ff7043;
+        }
+    </style>
+</svelte:head>
+<div id="map" />
 {#each $positions as position}
     <div>
-        Użytkownik 
+        Użytkownik
         {position.login}
-        był w 
-        {position.street} 
-        widziany ostatnio 
-        {new Date(position.time).today()} {new Date(position.time).timeNow()}
-        <br>
+        był w
+        {position.street}
+        widziany ostatnio
+        {new Date(position.time).today()}
+        {new Date(position.time).timeNow()}
+        <br />
     </div>
 {/each}
-<button on:click={() => setHome = true}>Dom</button>
+<button on:click={() => (setHome = true)}>Dom</button>
+
 <style>
     #map {
         width: 100%;
