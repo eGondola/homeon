@@ -204,11 +204,11 @@ async function main() {
     });
 
     app.post("/updateList", async (req, res) => {
-        let [list, group] = JSON.parse(req.body);
+        let group = JSON.parse(req.body);
         if (JSON.parse(req.body).length > 0)
             await database.groups.updateOne(
                 { token: group.token },
-                { $set: { list: list } }
+                { $set: { list: group.list } }
             );
         updateRooms(group.token);
 
