@@ -17,8 +17,8 @@
     function updateList() {
         fetch("/updateList", {
             method: "POST",
-            body: JSON.stringify([$currentGroup.list, $currentGroup]),
-        });
+            body: JSON.stringify([$currentGroup]),
+        })
     }
 
     function sendForm() {
