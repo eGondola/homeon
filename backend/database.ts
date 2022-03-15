@@ -14,7 +14,7 @@ export async function getDatabase() {
     return {
         users: database.collection<User>("users"),
         groups: database.collection<Group>("groups"),
-        light: database.collection("light"),
+        lastId: database.collection<{ id: number }>("lastId"),
     };
 }
 

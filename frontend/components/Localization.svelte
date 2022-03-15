@@ -5,7 +5,7 @@
 <script type="ts">
     import type { Writable } from "svelte/store";
     import { getContext, onMount } from "svelte";
-    import type { User, position } from "../../common/types";
+    import type { User, Position } from "../../common/types";
     import { MarkerWithLabel } from "@googlemaps/markerwithlabel";
 
     Date.prototype.today = function () {
@@ -34,13 +34,13 @@
     };
     const socket = io();
     const user = getContext<Writable<User>>("user");
-    const positions = getContext<Writable<position[]>>("positions");
+    const positions = getContext<Writable<Position[]>>("positions");
     const currentGroup = getContext<Writable<any>>("group");
     let markers: Array<MarkerWithLabel> = [];
     let actualPosition = $positions.find((e) => e.login == $user.login);
     var map: any;
     var setHome: boolean = false;
-    var homePosition: position;
+    var homePosition: Position;
     var homeMarker: any;
     var rad = function (x: any) {
         return (x * Math.PI) / 180;

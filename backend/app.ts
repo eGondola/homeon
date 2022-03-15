@@ -98,6 +98,9 @@ async function main() {
         })
     );
     const database = await getDatabase();
+    if ((await database.lastId.countDocuments()) === 0) {
+        await database.lastId.insertOne({ id: 0 });
+    }
 
     async function updateRooms(token: string) {
         io.to(token).emit("Group", await database.groups.findOne({ token }));
@@ -139,6 +142,7 @@ async function main() {
             plans: [],
             list: [],
             home: null,
+            lights: [],
         });
         database.users.updateOne(
             { login: req.session?.user.login },
@@ -225,17 +229,25 @@ async function main() {
 
     // lights
     app.post("/get-lights", async (req, res) => {
-        let lights = await database.light.findOne({ name: "lights" });
-        res.send(lights?.lights);
+        const { lights } =
+            (await database.groups.findOne({ token: req.body })) ?? {};
+        res.send(lights);
     });
 
-    app.post("/add-light", async (req, res) => {
-        database.light.updateOne(
-            { name: "lights" },
+    app.post("/api/add-light", async (req, res) => {
+        const { token } = req.body;
+        await database.lastId.updateOne({}, { $inc: { id: 1 } });
+        const { id } = (await database.lastId.findOne()) ?? {};
+        if (!id) {
+            throw new Error("No id");
+        }
+        io.send("0|SET|" + id);
+        await database.groups.updateOne(
+            { token },
             {
                 $push: {
                     lights: {
-                        id: parseInt(req.body),
+                        id,
                         name: "new",
                         work: false,
                     },
@@ -245,32 +257,28 @@ async function main() {
         res.send();
     });
 
-    app.post("/switch-light", async (req, res) => {
-        database.light.updateOne(
-            { name: "lights", "lights.id": parseInt(req.body.split("|")[0]) },
-            {
-                $set: {
-                    "lights.$.work":
-                        req.body.split("|")[1] == "ON" ? true : false,
-                },
-            }
+    app.post("/api/switch-light", async (req, res) => {
+        const { id, work, token } = req.body;
+        io.send(id + "|" + (work ? "ON" : "OFF"));
+        await database.groups.updateOne(
+            { token, "lights.id": id },
+            { $set: { "lights.$.work": work } }
         );
         res.send();
     });
 
-    app.post("/remove-light", async (req, res) => {
-        database.light.updateOne(
-            { name: "lights" },
-            { $pull: { lights: { id: JSON.parse(req.body) } } }
-        );
+    app.post("/api/remove-light", async (req, res) => {
+        const { token, id } = req.body;
+        io.send(id + "|SET|0");
+        database.groups.updateOne({ token }, { $pull: { lights: { id } } });
         res.send();
     });
 
-    app.post("/edit-lights", async (req, res) => {
-        let { id, name } = JSON.parse(req.body);
+    app.post("/api/edit-light", async (req, res) => {
+        let { id, name, token } = req.body;
 
-        database.light.updateOne(
-            { name: "lights", "lights.id": parseInt(id) },
+        await database.groups.updateOne(
+            { token, "lights.id": id },
             { $set: { "lights.$.name": name } }
         );
         res.send();
@@ -305,6 +313,7 @@ async function main() {
                 plans: [],
                 list: [],
                 home: null,
+                lights: [],
             }),
         ]);
 

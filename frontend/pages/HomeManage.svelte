@@ -1,14 +1,16 @@
-<script context="module" type="ts">
-    declare const io: typeof import("socket.io-client").io;
-</script>
-
 <script type="ts">
-    const socket = io();
+    import { getContext } from "svelte";
+    import type { Writable } from "svelte/store";
+    import type { Group } from "../../common/types";
+    import * as api from "../util/api";
 
-    let lights: any = { 0: {} };
+    const currentGroup = getContext<Writable<Group>>("group");
+
+    let lights: any = {};
     function getLights() {
         fetch("/get-lights", {
             method: "POST",
+            body: $currentGroup.token,
         })
             .then((odp) => odp.json())
             .then((v) => {
@@ -30,54 +32,47 @@
     function addLight() {
         fetch("/get-lights", {
             method: "POST",
+            body: $currentGroup.token,
         })
             .then((odp) => odp.json())
-            .then((lights) => {
-                let newLightId: any =
-                    parseInt(lights[lights.length - 1].id) + 1;
-                socket.emit("sendToAvr", "0|SET|" + newLightId);
-
-                fetch("/add-light", {
-                    method: "POST",
-                    body: newLightId,
+            .then(async () => {
+                await api.post("add-light", {
+                    token: $currentGroup.token,
                 });
 
                 getLights();
             });
     }
 
-    function onOffLight(lightId: number, onOff: boolean) {
-        let switchLight = lightId + "|" + (onOff ? "ON" : "OFF");
-
-        fetch("/switch-light", {
-            method: "POST",
-            body: switchLight,
+    async function onOffLight(id: number, work: boolean) {
+        await api.post("switch-light", {
+            id,
+            token: $currentGroup.token,
+            work,
         });
-        socket.emit("sendToAvr", switchLight);
     }
 
-    function resetLight(lightId: any) {
-        fetch("/remove-light", {
-            method: "POST",
-            body: lightId,
+    async function resetLight(id: number) {
+        await api.post("remove-light", {
+            id,
+            token: $currentGroup.token,
         });
-
-        socket.emit("sendToAvr", lightId + "|SET|0");
 
         getLights();
     }
 
     let editLightSwitch = false;
 
-    let allLights: any = [Object.values(lights).length];
-    let allLightsNames: any = [Object.values(lights).length];
+    let allLights: any = [];
+    let allLightsNames: any = [];
 
     function editLight() {
         allLights.forEach((light: any, key: number) => {
             if (light.name != allLightsNames[key]) {
-                fetch("/edit-lights", {
-                    method: "POST",
-                    body: JSON.stringify({ id: light.id, name: light.name }),
+                api.post("edit-light", {
+                    id: parseInt(light.id),
+                    token: $currentGroup.token,
+                    name: light.name,
                 });
             }
         });
