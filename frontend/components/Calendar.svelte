@@ -373,7 +373,7 @@
                     margin: 1vmin;
                     text-align: center;
                     font-size: 3.5vmin;
-                    min-height: 2rem;
+                    min-height: 1.85rem;
                     @media (min-width: 800px) {
                         font-size: 2.5vmin;
                     }
