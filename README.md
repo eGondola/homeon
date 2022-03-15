@@ -27,7 +27,7 @@
 "isset": false
 `
 
-#### lights
+#### light
 `
 "name": "lights",
 "lights": [

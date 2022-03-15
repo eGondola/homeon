@@ -1,14 +1,11 @@
 <script context="module" type="ts">
     declare const io: typeof import("socket.io-client").io;
 </script>
+
 <script type="ts">
     const socket = io();
 
     let lights: any = { 0: {} };
-    let editLightSwitch = false;
-
-    let allLights: any = [Object.values(lights).length];
-    let allLightsNames: any = [Object.values(lights).length];
 
     function lightChange()
     {
@@ -34,12 +31,11 @@
                         work: light.work,
                     };
 
-                    allLightsNames[key] = light.name
+                    allLightsNames[key] = light.name;
                 });
             });
     }
-    getLights()
-
+    getLights();
 
     function addLight() {
         fetch("/get-lights", {
@@ -47,55 +43,58 @@
         })
             .then((odp) => odp.json())
             .then((lights) => {
-                console.log(lights)
-                let newLightId: any = parseInt(lights[lights.length-1].id) + 1
+                let newLightId: any =
+                    parseInt(lights[lights.length - 1].id) + 1;
                 socket.emit("sendToAvr", "0|SET|" + newLightId);
 
                 fetch("/add-light", {
                     method: "POST",
                     body: newLightId,
-                })
+                });
 
-                getLights()
+                getLights();
             });
         lightChange();
     }
 
     function onOffLight(lightId: number, onOff: boolean) {
-        let switchLight = lightId + "|" + (onOff ? "ON" : "OFF")
-        
+        let switchLight = lightId + "|" + (onOff ? "ON" : "OFF");
+
         fetch("/switch-light", {
             method: "POST",
             body: switchLight,
-        })
+        });
         socket.emit("sendToAvr", switchLight);
         lightChange();
     }
 
     function resetLight(lightId: any) {
-        console.log(lightId)
         fetch("/remove-light", {
             method: "POST",
             body: lightId,
-        })
+        });
 
         socket.emit("sendToAvr", lightId + "|SET|0");
-        lightChange();
-        getLights()
+
+        getLights();
     }
 
+    let editLightSwitch = false;
+
+    let allLights: any = [Object.values(lights).length];
+    let allLightsNames: any = [Object.values(lights).length];
+
     function editLight() {
-        console.log(allLights)
         allLights.forEach((light: any, key: number) => {
-            if(light.name !=  allLightsNames[key]) {
+            if (light.name != allLightsNames[key]) {
                 fetch("/edit-lights", {
                     method: "POST",
-                    body: JSON.stringify({id: light.id, name: light.name}),
+                    body: JSON.stringify({ id: light.id, name: light.name }),
                 });
             }
-        })
-        lightChange();
-        getLights()
+        });
+
+        getLights();
     }
 </script>
 
@@ -111,7 +110,13 @@
                     {/if}
                 </div>
                 {#if editLightSwitch}
-                    <div on:click="{() => {resetLight(allLights[key].id)}}"><i class="icon-x" /></div>
+                    <div
+                        on:click={() => {
+                            resetLight(allLights[key].id);
+                        }}
+                    >
+                        <i class="icon-x" />
+                    </div>
                 {/if}
                 {#if !editLightSwitch}
                     <div class="light_switch">
@@ -120,7 +125,12 @@
                             id="switch{key}"
                             class="switch"
                             bind:checked={allLights[key].work}
-                            on:change={() => {onOffLight(allLights[key].id, allLights[key].work)}}
+                            on:change={() => {
+                                onOffLight(
+                                    allLights[key].id,
+                                    allLights[key].work
+                                );
+                            }}
                         />
                         <label for="switch{key}" class="lbl-off">Off</label>
                         <label for="switch{key}" class="lbl-on">On</label>
@@ -176,16 +186,6 @@
             flex-flow: column;
             align-items: end;
             justify-content: center;
-
-            // .edit {
-            //     position: absolute;
-            //     left: 2vmin;
-            //     background-color: $s-color;
-            //     color: white;
-
-            //     padding: 2vmin;
-            //     border-radius: 15vmin;
-            // }
 
             .light {
                 display: flex;

@@ -2,7 +2,6 @@
     import { getContext } from "svelte";
     import type { Writable } from "svelte/store";
 
-    //const group = getContext<Writable<any>>("group");
     let text: string;
     let count: number;
     let message: string = "";
@@ -26,9 +25,15 @@
         if (text.trim().length > 2 && count > 0) {
             let max = 0;
             for (let i = 0; i < $currentGroup.list.length; i++)
-                if (max < $currentGroup.list[i].id) max = $currentGroup.list[i].id;
+                if (max < $currentGroup.list[i].id)
+                    max = $currentGroup.list[i].id;
             max++;
-            $currentGroup.list.push({ text: text, count: count, id: max, checked: false});
+            $currentGroup.list.push({
+                text: text,
+                count: count,
+                id: max,
+                checked: false,
+            });
             $currentGroup.list = $currentGroup.list;
             updateList();
             text = "";
@@ -50,14 +55,21 @@
             {item.text}
             <br />
         </p>
-        <input type="checkbox" class="checkbox" on:click={() => {item.checked = !item.checked; updateList();}} checked={item.checked}>
+        <input
+            type="checkbox"
+            class="checkbox"
+            on:click={() => {
+                item.checked = !item.checked;
+                updateList();
+            }}
+            checked={item.checked}
+        />
     </div>
 {/each}
 <div class="input-group">
     <div>Nazwa: <input type="text" bind:value={text} /></div>
     <div>Sztuki: <input type="number" bind:value={count} /></div>
     <input type="submit" on:click={sendForm} id="submit" />
-    
 </div>
 {message}
 
