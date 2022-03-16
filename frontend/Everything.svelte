@@ -137,7 +137,7 @@
             {#if showGroups}
                 <Groups groups={$groupsStore} />
             {/if}
-            <Route path="/">
+            <Route>
                 <div class="navigation">
                     <div>
                         <div>
@@ -182,14 +182,6 @@
 
             <Route path="/household-duties">
                 <Localization />
-            </Route>
-
-            <Route path="/confirm/:token">
-                <p>Udało się potwierdzić email</p>
-            </Route>
-
-            <Route>
-                <p style="text-align: center">404 Not Found</p>
             </Route>
         </div>
     </Router>

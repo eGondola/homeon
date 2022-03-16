@@ -121,11 +121,8 @@ async function main() {
     });
 
     app.get("/confirm/:token", async (req, res, next) => {
-        if (await confirm(req)) {
-            next();
-        } else {
-            res.send("Zły token");
-        }
+        await confirm(req);
+        next();
     });
 
     app.get("/logout", async (req, res) => {
@@ -320,33 +317,41 @@ async function main() {
 
         console.log(confirmEmailToken);
 
-        nodemailer.createTransport({
-            sendmail: true,
-            newline: 'unix',
-            path: '/usr/sbin/sendmail'
-        }).sendMail({
-            from: '"HomeON" Inteligentny@Dom',
-            to: req.body.email,
-            subject: 'Rejestracja konta',
-            html: `
-            <div style="padding: 15px; border-radius: 5px; background-color: #ff7043; color: white; text-align: center">
-            <img src="https://egondola.eu/homeon.png" width="100" height="100" style="border-radius: 5px"><br>
-                <span style="color: white">Home ON</span><br>
-                <span style="color: white">Inteligentny Dom</span><br><br>
+        try {
+            await nodemailer
+                .createTransport({
+                    sendmail: true,
+                    newline: "unix",
+                    path: "/usr/sbin/sendmail",
+                })
+                .sendMail({
+                    from: '"HomeON" Inteligentny@Dom',
+                    to: req.body.email,
+                    subject: "Rejestracja konta",
+                    html: `
+<div style="padding: 15px; border-radius: 5px; background-color: #ff7043; color: white; text-align: center">
+<img src="https://egondola.eu/homeon.png" width="100" height="100" style="border-radius: 5px"><br>
+    <span style="color: white">Home ON</span><br>
+    <span style="color: white">Inteligentny Dom</span><br><br>
 
-                <h3>Witaj ${req.body.login}</h3><br><br>
+    <h3>Witaj ${req.body.login}</h3><br><br>
 
-                <h4>Kliknij poniżej, aby dokończyć rejestrację</h4><br>
-                <a href="https://egondola.eu/confirm/${confirmEmailToken}"><button style="border: none; padding: 10px 30px; border-radius: 5px; color: white; background-color: #546e7a;">Potwierdź adres email</button></a>
-            </div>`
-        });
-        
+    <h4>Kliknij poniżej, aby dokończyć rejestrację</h4><br>
+    <a href="https://egondola.eu/confirm/${confirmEmailToken}"><button style="border: none; padding: 10px 30px; border-radius: 5px; color: white; background-color: #546e7a;">Potwierdź adres email</button></a>
+</div>`,
+                });
+        } catch (error) {
+            if (error instanceof Error) {
+                console.error(error?.message);
+            }
+        }
+
         return "Konto zostało utworzone! Dokończ rejestrację klikając w link wysłany na podany adres email";
     }
 
     async function confirm(req: any) {
         const confirmEmailToken = req.params.token;
-        const user: any = await database.users.findOne({
+        const user = await database.users.findOne({
             confirmEmailToken,
         });
 
