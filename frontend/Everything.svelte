@@ -119,19 +119,19 @@
                     on:click={() => {
                         editProfile = !editProfile;
                     }}
-                    >
+                >
                     <i class="icon-profile" />
                 </div>
-                <div id="go_home">
-                    <a href="/" use:link><i class="icon-home" /></a>
-                </div>
                 <div
-                    class="show_groups {showGroups ? "" : "hiddenGroups"}"
+                    id="show_groups"
                     on:click={() => {
                         showGroups = !showGroups;
                     }}
                 >
-                    grupy
+                    Grupy <i class="icon-{showGroups ? "down" : "left"}-dir"/>
+                </div>
+                <div id="go_home">
+                    <a href="/" use:link><i class="icon-home" /></a>
                 </div>
             </div>
             {#if showGroups}
@@ -143,24 +143,32 @@
                         <div>
                             <div>
                                 <a href="/home-manage" use:link>
-                                    <div class="home-manage" />
+                                    <div class="home-manage">
+                                        Home Manager
+                                    </div>
                                 </a>
                                 <a href="/plans" use:link>
-                                    <div class="plans" />
+                                    <div class="plans">
+                                        Plany
+                                    </div>
                                 </a>
                             </div>
                         </div>
                         <div>
                             <div>
                                 <a href="/shopping-list" use:link>
-                                    <div class="shopping-list" />
+                                    <div class="shopping-list">
+                                        Listy
+                                    </div>
                                 </a>
                             </div>
                         </div>
                         <div>
                             <div>
                                 <a href="/household-duties" use:link>
-                                    <div class="household-duties" />
+                                    <div class="household-duties">
+                                        Mapy
+                                    </div>
                                 </a>
                             </div>
                         </div>
@@ -291,14 +299,26 @@
                 align-items: center;
                 justify-content: center;
                 color: white;
-
+                
                 background-color: $p-color-dark;
                 border-radius: 0vmin 0vmin 2vmin 2vmin;
             }
 
-            #profile, #go_home {                
-                margin-right: 1vmin;
+            #profile {
+                height: 12vmin;
+                width: 12vmin;
                 margin-left: 1vmin;
+                margin-right: 1vmin;
+            }
+
+            #show_groups {
+                flex: 1;
+            }
+
+            #show_groups,
+            #go_home {
+                height: 12vmin;
+                margin-right: 1vmin;
 
                 a {
                     color: white;
@@ -306,33 +326,11 @@
 
                     width: 12vmin;
                     height: 12vmin;
-
+                    
                     display: flex;
                     align-items: center;
                     justify-content: center;
                 }
-            }
-
-            #profile {
-                width: 30vmin;
-                height: 9vmin;
-            }
-
-            #go_home {
-                width: 48vmin;
-                height: 8vmin;
-            }
-
-            .show_groups {
-                flex: 1;
-
-                height: 12vmin;
-                width: 24vmin;
-                margin-right: 1vmin;
-            }
-
-            .hiddenGroups {
-                background-color: $s-color;
             }
         }
 
@@ -378,32 +376,39 @@
                             }
                         }
 
+                        .home-manage, .plans, .shopping-list, .household-duties {
+                            background-size: 35%;
+                            background-position-y: 60%;
+
+                            color: white;
+                            text-align: center;
+                            padding-top: 5vmin;
+                        }
+
                         .home-manage {
                             margin-left: 2.5vmin;
                             margin-right: 4vmin;
                             background-image: url("icons/home-manage.png");
-                            background-size: 40%;
                         }
 
                         .plans {
                             margin-left: 4vmin;
                             margin-right: 2.5vmin;
                             background-image: url("icons/plans.png");
-                            background-size: 40%;
                         }
 
                         .shopping-list {
                             margin-left: 2.5vmin;
                             margin-right: 2.5vmin;
                             background-image: url("icons/shopping-list.png");
-                            background-size: 18%;
+                            background-size: 16%;
                         }
 
                         .household-duties {
                             margin-left: 2.5vmin;
                             margin-right: 2.5vmin;
-                            background-image: url("icons/clean.png");
-                            background-size: 18%;
+                            background-image: url("icons/maps.png");
+                            background-size: 16%;
                         }
                     }
                 }

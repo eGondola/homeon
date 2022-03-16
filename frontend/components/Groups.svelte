@@ -49,13 +49,13 @@
                     margin: 1vmin;
                     border-radius: 10vmin;
 
-                    background-color: $p-color;
+                    background-color: $p-color-dark;
                     box-shadow: -0.5vmin -0.5vmin 1vmin 0vmin #00000040,
                         0.5vmin 0.5vmin 1vmin 0vmin #00000040;
                 }
 
                 .active {
-                    background-color: $p-color-light;
+                    background-color: $p-color;
                 }
             }
         }

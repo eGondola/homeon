@@ -65,6 +65,7 @@
                     }}
                 >
                     <i class="icon-share" />
+                    Skopiuj link&nbsp;
                 </div>
             </div>
         {/each}
@@ -117,8 +118,7 @@
 
                             color: white;
                             background-color: $p-color;
-                            box-shadow: -0.5vmin -0.5vmin 1vmin 0vmin #00000040,
-                                0.5vmin 0.5vmin 1vmin 0vmin #00000040;
+                            box-shadow: -0.5vmin -0.5vmin 1vmin 0vmin #00000040, 0.5vmin 0.5vmin 1vmin 0vmin #00000040;
                         }
                     }
                 }
@@ -133,10 +133,22 @@
                     margin: 1vmin;
                     border-radius: 10vmin;
 
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
                     background-color: $p-color;
-                    box-shadow: -0.5vmin -0.5vmin 1vmin 0vmin #00000040,
-                        0.5vmin 0.5vmin 1vmin 0vmin #00000040;
+                    box-shadow: -0.5vmin -0.5vmin 1vmin 0vmin #00000040, 0.5vmin 0.5vmin 1vmin 0vmin #00000040;
+                    
+                    font-size: 4vmin;
                 }
+            }
+
+            .group_name {
+                border-radius: 5px;
+                background-color: $s-color;
+
+                font-size: 5vmin;
             }
         }
     }
