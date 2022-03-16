@@ -42,6 +42,7 @@
     @import "../styles/variables.scss";
     
     #arrows {
+        padding-top: 1rem;
         display: flex;
         flex-flow: row;
 
