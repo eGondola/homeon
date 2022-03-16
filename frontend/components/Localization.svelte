@@ -214,8 +214,9 @@
     </style>
 </svelte:head>
 <div id="map" />
+<div class="container">
 {#each $positions as position}
-    <div>
+    <div class="l">
         Użytkownik
         {position.login}
         był w
@@ -226,12 +227,26 @@
         <br />
     </div>
 {/each}
-{InHome}
-<button on:click={() => (setHome = true)}>Dom</button>
-
+{InHome}<br>
+<button on:click={() => (setHome = true)} class="home">Dom</button>
+</div>
 <style>
     #map {
         width: 100%;
         height: 400px;
+        border: 1px black solid;
+    }
+    .home {
+        background-color: #ff7043;
+        border: 1px black solid;
+        padding: 5px;
+        border-radius: 3px;
+        width: 100%;
+    }
+    .l
+    {
+        margin: 3px;
+        border: 1px solid black;
+        padding: 3px;
     }
 </style>
