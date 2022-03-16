@@ -15,9 +15,10 @@
         updateList();
     }
     function updateList() {
+        let group = JSON.stringify({group: $currentGroup});
         fetch("/updateList", {
             method: "POST",
-            body: JSON.stringify([$currentGroup]),
+            body: group,
         })
     }
 
@@ -138,10 +139,11 @@
     }
 
     #submit {
-        border: black 1px solid;
-        border-radius: 15%;
+        border: white 1px solid;
         width: 100px;
         background-color: #ffa270;
-        color: white;
+        margin-right: 5px;
+        margin-left: auto;
+        color: black;
     }
 </style>

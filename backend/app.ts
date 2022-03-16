@@ -30,8 +30,9 @@ async function main() {
         });
         socket.on("newPosition", (obj) => {
             handleErrors(async () => {
-                let url = `https://api.opencagedata.com/geocode/v1/json?q=${obj.position.x}+${obj.position.y}&key=6f9855f0d9d04be3b7d02f810a09b3ca`;
-                let street = (await axios.get(url)).data.results[0].formatted;
+                //let url = `https://api.opencagedata.com/geocode/v1/json?q=${obj.position.x}+${obj.position.y}&key=6f9855f0d9d04be3b7d02f810a09b3ca`;
+                //let street = (await axios.get(url)).data.results[0].formatted;
+                let street = "";
                 await database.users.updateOne(
                     { login: obj.user.login, email: obj.user.email },
                     {
@@ -226,13 +227,13 @@ async function main() {
     app.post("/updateList", (req, res) => {
         handleErrors(async () => {
             let group = JSON.parse(req.body);
-            if (JSON.parse(req.body).length > 0)
+            //group = group.group;
+            //if (JSON.parse(req.body).length > 0)
                 await database.groups.updateOne(
-                    { token: group.token },
-                    { $set: { list: group.list } }
+                    { token: group.group.token },
+                    { $set: { list: group.group.list } }
                 );
             await updateRooms(group.token);
-
             res.send();
         });
     });
