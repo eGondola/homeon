@@ -26,7 +26,7 @@ export type Position = {
     street: string;
 };
 
-type Light = {
+export type Light = {
     id: number;
     name: string;
     work: boolean;

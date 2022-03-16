@@ -1,46 +1,48 @@
 <script type="ts">
     import { getContext } from "svelte";
     import type { Writable } from "svelte/store";
-    import type { Group } from "../../common/types";
+    import type { Group, Light } from "../../common/types";
     import * as api from "../util/api";
 
     const currentGroup = getContext<Writable<Group>>("group");
 
-    let lights: any = {};
+    $: ({ token } = $currentGroup);
+
+    let lights: Light[] = [];
     function getLights() {
         fetch("/get-lights", {
             method: "POST",
-            body: $currentGroup.token,
+            body: token,
         })
             .then((odp) => odp.json())
             .then((v) => {
                 lights = v;
 
-                Object.values(lights).forEach((light: any, key) => {
-                    allLights[key] = {
-                        id: light.id,
-                        name: light.name,
-                        work: light.work,
+                lights.forEach(({ id, name, work }, i) => {
+                    allLights[i] = {
+                        id,
+                        name,
+                        work,
                     };
 
-                    allLightsNames[key] = light.name;
+                    allLightsNames[i] = name;
                 });
             });
     }
     $: {
-        $currentGroup;
+        token;
         getLights();
     }
 
     function addLight() {
         fetch("/get-lights", {
             method: "POST",
-            body: $currentGroup.token,
+            body: token,
         })
             .then((odp) => odp.json())
             .then(async () => {
                 await api.post("add-light", {
-                    token: $currentGroup.token,
+                    token,
                 });
 
                 getLights();
@@ -50,7 +52,7 @@
     async function onOffLight(id: number, work: boolean) {
         await api.post("switch-light", {
             id,
-            token: $currentGroup.token,
+            token,
             work,
         });
     }
@@ -58,24 +60,24 @@
     async function resetLight(id: number) {
         await api.post("remove-light", {
             id,
-            token: $currentGroup.token,
+            token,
         });
 
-        getLights();
+        editLights();
     }
 
     let editLightSwitch = false;
 
-    let allLights: any = [];
-    let allLightsNames: any = [];
+    let allLights: Light[] = [];
+    let allLightsNames: string[] = [];
 
-    function editLight() {
-        allLights.forEach((light: any, key: number) => {
-            if (light.name != allLightsNames[key]) {
+    function editLights() {
+        allLights.forEach(({ id, name }, i) => {
+            if (name != allLightsNames[i]) {
                 api.post("edit-light", {
-                    id: parseInt(light.id),
-                    token: $currentGroup.token,
-                    name: light.name,
+                    id,
+                    token,
+                    name,
                 });
             }
         });
@@ -86,40 +88,36 @@
 
 <div id="all">
     <div>
-        {#each Object.values(lights) as light, key}
+        {#each lights as light, i}
             <div class="light">
                 <div class="title">
                     {#if !editLightSwitch}
-                        {allLights[key].name}
+                        {allLights[i].name}
                     {:else}
-                        <input type="text" bind:value={allLights[key].name} />
+                        <input type="text" bind:value={allLights[i].name} />
                     {/if}
                 </div>
                 {#if editLightSwitch}
                     <div
                         on:click={() => {
-                            resetLight(allLights[key].id);
+                            resetLight(allLights[i].id);
                         }}
                     >
                         <i class="icon-x" />
                     </div>
-                {/if}
-                {#if !editLightSwitch}
+                {:else}
                     <div class="light_switch">
                         <input
                             type="checkbox"
-                            id="switch{key}"
+                            id="switch{i}"
                             class="switch"
-                            bind:checked={allLights[key].work}
+                            bind:checked={allLights[i].work}
                             on:change={() => {
-                                onOffLight(
-                                    allLights[key].id,
-                                    allLights[key].work
-                                );
+                                onOffLight(allLights[i].id, allLights[i].work);
                             }}
                         />
-                        <label for="switch{key}" class="lbl-off">Off</label>
-                        <label for="switch{key}" class="lbl-on">On</label>
+                        <label for="switch{i}" class="lbl-off">Off</label>
+                        <label for="switch{i}" class="lbl-on">On</label>
                     </div>
                 {/if}
             </div>
@@ -141,7 +139,7 @@
                 class="edit"
                 on:click={() => {
                     editLightSwitch = !editLightSwitch;
-                    editLight();
+                    editLights();
                 }}
             >
                 <i class="icon-v" />
