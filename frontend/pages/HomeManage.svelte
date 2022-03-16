@@ -27,7 +27,10 @@
                 });
             });
     }
-    getLights();
+    $: {
+        $currentGroup;
+        getLights();
+    }
 
     function addLight() {
         fetch("/get-lights", {

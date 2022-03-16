@@ -92,7 +92,7 @@
                 <div>
                     <i class="icon-profile" />
                 </div>
-                <span>moj_login</span>
+                <span>{$user.login}</span>
             </div>
             <div>
                 <div
@@ -105,6 +105,9 @@
                 </div>
             </div>
         </div>
+        <div id="user_info">
+            <span>Adres email: {$user.email}</span>
+        </div>
         <Profile {groupsStore} />
     </div>
 {:else}
@@ -116,19 +119,19 @@
                     on:click={() => {
                         editProfile = !editProfile;
                     }}
-                >
+                    >
                     <i class="icon-profile" />
                 </div>
+                <div id="go_home">
+                    <a href="/" use:link><i class="icon-home" /></a>
+                </div>
                 <div
-                    id="show_groups"
+                    class="show_groups {showGroups ? "" : "hiddenGroups"}"
                     on:click={() => {
                         showGroups = !showGroups;
                     }}
                 >
-                    Pokaż grupy
-                </div>
-                <div id="go_home">
-                    <a href="/" use:link><i class="icon-home" /></a>
+                    grupy
                 </div>
             </div>
             {#if showGroups}
@@ -269,6 +272,13 @@
                 }
             }
         }
+
+        #user_info {
+            text-align: center;
+
+            font-size: 5vmin;
+            color: $p-color-dark;
+        }
     }
 
     .home {
@@ -294,21 +304,9 @@
                 border-radius: 0vmin 0vmin 2vmin 2vmin;
             }
 
-            #profile {
-                height: 11vmin;
-                width: 11vmin;
-                margin: 1vmin;
-                border-radius: 50%;
-            }
-
-            #show_groups {
-                flex: 1;
-            }
-
-            #show_groups,
-            #go_home {
-                height: 12vmin;
+            #profile, #go_home {                
                 margin-right: 1vmin;
+                margin-left: 1vmin;
 
                 a {
                     color: white;
@@ -321,6 +319,28 @@
                     align-items: center;
                     justify-content: center;
                 }
+            }
+
+            #profile {
+                width: 30vmin;
+                height: 9vmin;
+            }
+
+            #go_home {
+                width: 48vmin;
+                height: 8vmin;
+            }
+
+            .show_groups {
+                flex: 1;
+
+                height: 12vmin;
+                width: 24vmin;
+                margin-right: 1vmin;
+            }
+
+            .hiddenGroups {
+                background-color: $s-color;
             }
         }
 
