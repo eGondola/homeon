@@ -2,10 +2,9 @@ import { MongoClient } from "mongodb";
 import * as dotenv from "dotenv";
 import type { Group } from "../common/types";
 
-const databaseName = "HomeON";
-
 export async function getDatabase() {
     dotenv.config();
+    const databaseName = process.env.DATABASE_NAME ?? "HomeON";
     const client = new MongoClient(
         process.env.DATABASE_CONNECTION_STRING ?? "mongodb://localhost:27017"
     );

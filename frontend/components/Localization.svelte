@@ -5,8 +5,9 @@
 <script type="ts">
     import type { Writable } from "svelte/store";
     import { getContext, onMount } from "svelte";
-    import type { User, Position } from "../../common/types";
+    import type { User, Position, Group } from "../../common/types";
     import { MarkerWithLabel } from "@googlemaps/markerwithlabel";
+    import * as api from "../util/api";
 
     Date.prototype.today = function () {
         return (
@@ -35,7 +36,7 @@
     const socket = io();
     const user = getContext<Writable<User>>("user");
     const positions = getContext<Writable<Position[]>>("positions");
-    const currentGroup = getContext<Writable<any>>("group");
+    const currentGroup = getContext<Writable<Group>>("group");
     let markers: Array<MarkerWithLabel> = [];
     let actualPosition = $positions.find((e) => e.login == $user.login);
     var map: any;
@@ -98,12 +99,19 @@
         }
     }
 
-    function IsSomeoneInHome()
-    {
-        let minDistance = 100000000;;
-        if($currentGroup.home)
-        {
-            
+    function OffAllLights() {
+        for (const { id } of $currentGroup.lights) {
+            api.post("switch-light", {
+                id,
+                token: $currentGroup.token,
+                work: false,
+            });
+        }
+    }
+
+    function IsSomeoneInHome() {
+        let minDistance = 100000000;
+        if ($currentGroup.home) {
             let home = $currentGroup.home;
             $positions.forEach((position) => {
                 let distance = getDistance(
@@ -116,10 +124,10 @@
                 minDistance = distance < minDistance ? distance : minDistance;
             });
         }
-        if(minDistance > 25)
+        if (minDistance > 4) {
+            OffAllLights();
             InHome = "Nie ma nikogo w domu";
-        else
-            InHome = "";
+        } else InHome = "";
     }
 
     function OnMapClick(event: any) {
@@ -173,9 +181,11 @@
             );
         });
     }
-    let InHome = '';
+    let InHome = "";
 
-    $: { $positions, AddMarkers(map), AddHomeMarker(), IsSomeoneInHome() }
+    $: {
+        $positions, AddMarkers(map), AddHomeMarker(), IsSomeoneInHome();
+    }
 
     onMount(() => {
         initMap();
@@ -216,7 +226,8 @@
     </div>
 {/each}
 {InHome}
-<button on:click={() => setHome = true}>Dom</button>
+<button on:click={() => (setHome = true)}>Dom</button>
+
 <style>
     #map {
         width: 100%;

@@ -56,11 +56,6 @@ async function main() {
                 { $set: { home: { x: obj.lat, y: obj.lng } } }
             );
         });
-
-        // lights
-        socket.on("sendToAvr", (command) => {
-            io.send(command);
-        });
     });
     async function getPositions(token: string) {
         interface Position {
@@ -95,7 +90,7 @@ async function main() {
     app.use(
         cookieSession({
             name: "session",
-            keys: [process.env.SESSION_SECRET!],
+            keys: [process.env.SESSION_SECRET ?? "secret"],
         })
     );
     const database = await getDatabase();
@@ -282,7 +277,7 @@ async function main() {
         res.send();
     });
 
-    server.listen(process.env.PORT || 3000);
+    server.listen(process.env.PORT || 8080);
 
     async function register(req: any) {
         const email = await database.users.findOne({ email: req.body.email });
