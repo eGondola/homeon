@@ -316,7 +316,7 @@
     @import "../styles/variables.scss";
 
     .calendar {
-        padding-top: 2rem;
+        padding-top: 0.5rem;
         font-size: 5vmin;
 
         @media (min-width: 800px) {

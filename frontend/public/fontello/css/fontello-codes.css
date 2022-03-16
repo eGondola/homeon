@@ -11,5 +11,7 @@
 .icon-logout:before { content: '\e809'; } /* '' */
 .icon-edit:before { content: '\e80a'; } /* '' */
 .icon-v:before { content: '\e80b'; } /* '' */
+.icon-down-dir:before { content: '\e80c'; } /* '' */
+.icon-up-dir:before { content: '\e80d'; } /* '' */
 .icon-load:before { content: '\e834'; } /* '' */
 .icon-share:before { content: '\f1e0'; } /* '' */
