@@ -1,5 +1,6 @@
 <script context="module" type="ts">
     declare const io: typeof import("socket.io-client").io;
+    declare const google: any;
 </script>
 
 <script type="ts">
