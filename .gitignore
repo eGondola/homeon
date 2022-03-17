@@ -2,3 +2,5 @@ node_modules
 /frontend/public/bundle.*
 .env
 /app.js
+/python/__pycache__
+/python/output

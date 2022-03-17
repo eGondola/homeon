@@ -9,6 +9,9 @@
 2. `npm run dev`
 3. Open `localhost:3000` in the browser
 
+## Python generate App
+`auto-py-to-exe`
+
 ## Database
 
 #### list

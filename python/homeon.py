@@ -4,8 +4,8 @@ import asyncio
 import serial
 
 com = serial.Serial(
-    port = 'COM4',
-    baudrate = 600
+    port = "COM"+input(),
+    baudrate = input()
 )
 
 com.isOpen()
@@ -23,6 +23,7 @@ async def message(data):
 
 async def main():
     await client.connect("https://egondola.eu/")
+    print("Successfully connected to Home ON")
     await client.wait()
 
 
