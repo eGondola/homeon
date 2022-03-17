@@ -41,109 +41,135 @@
             count = 0;
             message = "";
         } else {
-            message = "Podaj dłuższą nazwe lub ilość większą od zera!";
+            message = "Podaj dłuższą nazwę, podaj ilość większą od zera";
         }
     }
 </script>
 
+<div id="cards">
 {#each $currentGroup.list as item}
     <div class="card">
-        <div class="num-display">
-            {item.count}
-        </div>
-        <div class="close" on:click={() => deleteItem(item.id)}>X</div>
-        <p class="text-display">
-            {item.text}
-            <br />
-        </p>
         <input
-            type="checkbox"
             class="checkbox"
+            type="checkbox"
             on:click={() => {
                 item.checked = !item.checked;
                 updateList();
             }}
             checked={item.checked}
         />
+
+        <div class="count">{item.count}</div>
+
+        <div class="name">{item.text}</div>
+
+        <div class="delete" on:click={() => deleteItem(item.id)}><i class="icon-x"/></div>
     </div>
 {/each}
-<div class="input-group">
-    <div>Nazwa: <input type="text" bind:value={text} /></div>
-    <div>Sztuki: <input type="number" bind:value={count} /></div>
-    <input type="submit" on:click={sendForm} id="submit" />
 </div>
-{message}
 
-<style>
-    .text-display {
-        text-align: center;
-        margin-left: 40px;
+<div id="cardsForm">
+    <div>
+        <input id="nameForm" type="text" placeholder="Nazwa produktu" bind:value={text} />
+        <input id="countForm" type="number" placeholder="np. 3" bind:value={count} />
+        <button type="submit" on:click={sendForm} id="submit"><i class="icon-plus"/></button>
+    </div>
+    <div id="cardsMessage">
+        {message}
+    </div>
+</div>
+
+<style lang="scss">
+    @import "../styles/variables.scss";
+
+    #cards {
+        // display: flex;
+        // flex-flow: column;
+        // align-items: center;
+        // justify-content: center;
+
+        margin: 4vmin;
+        
+        .card {
+            margin: 2vmin;
+
+            //background-color: red;
+            border-bottom: 0.2vmin solid $s-color-light;
+            display: flex;
+            flex-flow: row;
+
+            font-size: 5vmin;
+
+            .checkbox {
+                width: 7vmin;
+                height: 7vmin;
+            }
+
+            .count {
+                margin-left: 3vmin;
+            }
+
+            .name {
+                flex: 1
+            }
+
+            .delete {
+                margin-right: 3vmin;
+                color: $p-color-dark;
+            }
+
+            > div {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
     }
 
-    .checkbox {
-        width: 30px;
-        height: 30px;
-    }
-
-    .num-display {
-        position: absolute;
-        left: -5px;
-        top: -3px;
-        width: 50px;
-        height: 50px;
-        background: #546e7a;
-        color: #fff;
-        border: 1px #eee solid;
-        border-radius: 50%;
-        padding: 10px;
-        text-align: center;
-        font-size: 19px;
-    }
-
-    .close {
-        position: absolute;
-        top: 10px;
-        right: 20px;
-        cursor: pointer;
-        background: none;
-        border: none;
-    }
-
-    .card {
-        background-color: #c63f17;
-        color: rgb(233, 233, 255);
-        border-radius: 15px;
-        padding: 25px 10px;
-        margin: 5px 0;
-        position: relative;
-    }
-
-    .input-group {
-        background-color: #c63f17;
+    #cardsForm {
         display: flex;
-        flex-direction: column;
-        border: 1px solid #ccc;
-        padding: 8px 10px;
-        border-radius: 8px;
-    }
+        flex-flow: column;
+        align-items: center;
+        justify-content: center;
 
-    input {
-        margin: 5px;
-        font-size: 16px;
-        float: right;
-        border-radius: 2px;
-    }
+        > div {
+            display: flex;
+            flex-flow: row;
 
-    input:focus {
-        outline: none;
-    }
+            #countForm {
+                width: 14vmin;
+                text-align: center;
+            }
 
-    #submit {
-        border: white 1px solid;
-        width: 100px;
-        background-color: #ffa270;
-        margin-right: 5px;
-        margin-left: auto;
-        color: black;
+            input {
+                width: 100%;
+                border: 1px solid $p-color;
+                border-radius: 2vmin;
+                font-size: 5vmin;
+                padding-left: 1vmin;
+                padding-right: 1vmin;
+
+                margin-right: 2vmin;
+            }
+
+            input:focus {
+                outline: 1px solid $p-color;
+            }
+
+            button {
+                border: none;
+                padding: 2vmin 2vmin;
+                margin: 1vmin;
+                border-radius: 10vmin;
+
+                color: white;
+                background-color: $p-color;
+                box-shadow: -0.5vmin -0.5vmin 1vmin 0vmin #00000040, 0.5vmin 0.5vmin 1vmin 0vmin #00000040;
+            }
+        }
+
+        #cardsMessage {
+            margin-top: 3vmin;
+        }
     }
 </style>
