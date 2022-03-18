@@ -9,6 +9,8 @@ import { Server } from "socket.io";
 import axios from "axios";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
+import addGroup from "./api/routes/add-group";
+import type { Route, Session } from "./api/make-route";
 
 dotenv.config();
 
@@ -142,26 +144,21 @@ async function main() {
         res.send();
     });
 
-    app.post("/api/add-group", (req, res) => {
-        handleErrors(async () => {
-            const token = nanoid();
-            await Promise.all([
-                database.groups.insertOne({
-                    name: req.body.name,
-                    token,
-                    plans: [],
-                    list: [],
-                    home: null,
-                    lights: [],
-                }),
-                database.users.updateOne(
-                    { login: req.session?.user.login },
-                    { $push: { groups: token } }
-                ),
-            ]);
-            res.send(token);
-        });
-    });
+    const api = {
+        post<Response>(path: string, route: Route<Response>) {
+            app.post(`/api/${path}`, ({ body, session }, response) => {
+                handleErrors(async () => {
+                    response.send(
+                        JSON.stringify(
+                            await route(body, (session as Session) ?? undefined)
+                        )
+                    );
+                });
+            });
+        },
+    };
+
+    api.post("add-group", addGroup(database));
 
     app.post("/api/leave-group", (req, res) => {
         handleErrors(async () => {
@@ -229,10 +226,10 @@ async function main() {
             let group = JSON.parse(req.body);
             //group = group.group;
             //if (JSON.parse(req.body).length > 0)
-                await database.groups.updateOne(
-                    { token: group.group.token },
-                    { $set: { list: group.group.list } }
-                );
+            await database.groups.updateOne(
+                { token: group.group.token },
+                { $set: { list: group.group.list } }
+            );
             await updateRooms(group.token);
             res.send();
         });

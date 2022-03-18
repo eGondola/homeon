@@ -27,3 +27,5 @@ type User = {
     time: number;
     street: string;
 };
+
+export type Database = Awaited<ReturnType<typeof getDatabase>>;

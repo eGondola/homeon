@@ -2,13 +2,14 @@
     import type { Writable } from "svelte/store";
     import type { Group } from "../../common/types";
     import * as api from "../util/api";
+    import * as typedApi from "../util/typed-api";
 
     export let groupsStore: Writable<Group[]>;
 
     let name: string;
 
     async function addGroup() {
-        const token = await api.post("add-group", {
+        const token = await typedApi.post("add-group", {
             name,
         });
 
@@ -19,6 +20,8 @@
                 token,
                 plans: [],
                 list: [],
+                home: null,
+                lights: [],
             },
         ]);
     }
@@ -118,7 +121,8 @@
 
                             color: white;
                             background-color: $p-color;
-                            box-shadow: -0.5vmin -0.5vmin 1vmin 0vmin #00000040, 0.5vmin 0.5vmin 1vmin 0vmin #00000040;
+                            box-shadow: -0.5vmin -0.5vmin 1vmin 0vmin #00000040,
+                                0.5vmin 0.5vmin 1vmin 0vmin #00000040;
                         }
                     }
                 }
@@ -138,8 +142,9 @@
                     justify-content: center;
 
                     background-color: $p-color;
-                    box-shadow: -0.5vmin -0.5vmin 1vmin 0vmin #00000040, 0.5vmin 0.5vmin 1vmin 0vmin #00000040;
-                    
+                    box-shadow: -0.5vmin -0.5vmin 1vmin 0vmin #00000040,
+                        0.5vmin 0.5vmin 1vmin 0vmin #00000040;
+
                     font-size: 4vmin;
                 }
             }
