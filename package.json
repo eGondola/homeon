@@ -2,10 +2,10 @@
     "scripts": {
         "start": "run-s start:*",
         "start:frontend": "rollup -c",
-        "start:backend": "ts-node backend/app.ts",
+        "start:backend": "ts-node -r tsconfig-paths/register backend/app.ts",
         "dev": "run-p dev:*",
         "dev:frontend": "rollup -cw",
-        "dev:backend": "ts-node-dev backend/app.ts"
+        "dev:backend": "ts-node-dev -r tsconfig-paths/register backend/app.ts"
     },
     "dependencies": {
         "@googlemaps/markerwithlabel": "^2.0.6",
@@ -41,6 +41,7 @@
         "rollup-plugin-svelte": "^7.1.0",
         "sass": "^1.45.0",
         "svelte-preprocess": "^4.9.8",
-        "ts-node-dev": "^1.1.8"
+        "ts-node-dev": "^1.1.8",
+        "tsconfig-paths": "^3.14.0"
     }
 }

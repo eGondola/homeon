@@ -9,8 +9,8 @@ import { Server } from "socket.io";
 import axios from "axios";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
-import addGroup from "./api/routes/add-group";
 import type { Route, Session } from "./api/make-route";
+import addGroup from "route:add-group";
 
 dotenv.config();
 

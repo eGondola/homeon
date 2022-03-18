@@ -1,8 +1,7 @@
 import type { z, ZodType } from "zod";
-import type * as addGroup from "../backend/api/routes/add-group";
 
 export type Api = MakeApi<{
-    "add-group": typeof addGroup;
+    "add-group": typeof import("route:add-group");
 }>;
 
 type MakeApi<T> = {

@@ -3,7 +3,11 @@
     "compilerOptions": {
         "esModuleInterop": true,
         "strict": true,
-        "types": ["svelte"]
+        "types": ["svelte"],
+        "baseUrl": ".",
+        "paths": {
+            "route:*": ["backend/api/routes/*"]
+        }
     },
     "exclude": ["node_modules/*"]
 }

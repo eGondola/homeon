@@ -53,5 +53,46 @@
 ]
 `
 
+## Adding an endpoint to the typed API
+1. Create file `backend/api/routes/my-endpoint.ts`:
+```ts
+import { z } from "zod";
+import { makePostRoute } from "../make-route";
 
+export default function myEndpoint(/* pass objects like database here */) {
+    return makePostRoute(async ({ /* params from schema */ }, { login, email }) => {
+        // DO STUFF HERE
+        // return value is sent to the client as JSON
+    }, schema);
+}
 
+export const schema = z.object({
+    // example begin
+    name: z.string(),
+    id: z.number(),
+    // example end
+});
+```
+2. Add this to `common/api.ts` inside the `Api` type declaration:
+```ts
+    "my-endpoint": typeof import("route:my-endpoint");
+```
+3. Add this to `app.ts` somewhere after the `const api` declaration:
+```ts
+api.post("my-endpoint", myEndpoint(/* pass objects like database here */));
+```
+
+4. Hover over `myEndpoint`, click Quick Fix and click:
+> add import from "route:my-endpoint"
+5. Use the endpoint in frontend code:
+```ts
+import * as typedApi from "../util/typed-api";
+
+// in an async function
+const json = await typedApi.post("my-endpoint", {
+    // example begin
+    name: "Volper",
+    id: 1,
+    // example end
+});
+```
