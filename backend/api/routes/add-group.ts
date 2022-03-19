@@ -3,7 +3,11 @@ import { makePostRoute } from "../make-route";
 import type { Database } from "../../database";
 import { nanoid } from "nanoid";
 
-export default function addGroup(database: Database) {
+const schema = z.object({
+    name: z.string(),
+});
+
+export function addGroup(database: Database) {
     return makePostRoute(async ({ name }, { login }) => {
         const token = nanoid();
         await Promise.all([
@@ -21,6 +25,4 @@ export default function addGroup(database: Database) {
     }, schema);
 }
 
-export const schema = z.object({
-    name: z.string(),
-});
+addGroup.schema = schema;

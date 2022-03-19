@@ -1,16 +1,22 @@
 import type { z, ZodType } from "zod";
+import type * as routes from "../backend/api/routes";
 
-export type Api = MakeApi<{
-    "add-group": typeof import("route:add-group");
-}>;
+type Routes = typeof routes;
 
-type MakeApi<T> = {
-    [K in keyof T]: {
-        response: Awaited<ReturnType<ReturnType<Get<"default", T[K]>>>>;
-        request: z.infer<Zod<Get<"schema", T[K]>>>;
+export type Api = {
+    [Route in keyof Routes as CamelToKebabCase<Route>]: {
+        response: Awaited<ReturnType<ReturnType<Routes[Route]>>>;
+        request: z.infer<Zod<Get<Routes[Route], "schema">>>;
     };
 };
 
-type Get<Prop, T> = Prop extends keyof T ? T[Prop] : never;
+type Get<T, Prop> = Prop extends keyof T ? T[Prop] : never;
 type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
 type Zod<T> = T extends ZodType<any, any, any> ? T : never;
+
+// https://stackoverflow.com/questions/60269936/typescript-convert-generic-object-from-snake-to-camel-case
+type CamelToKebabCase<S extends string> = S extends `${infer T}${infer U}`
+    ? `${T extends Capitalize<T>
+          ? "-"
+          : ""}${Lowercase<T>}${CamelToKebabCase<U>}`
+    : S;

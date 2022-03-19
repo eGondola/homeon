@@ -59,31 +59,33 @@
 import { z } from "zod";
 import { makePostRoute } from "../make-route";
 
-export default function myEndpoint(/* pass objects like database here */) {
+const schema = z.object({
+    // example begin
+    name: z.string(),
+    id: z.number(),
+    // example end
+});
+
+export function myEndpoint(/* pass objects like database here */) {
     return makePostRoute(async ({ /* params from schema */ }, { login, email }) => {
         // DO STUFF HERE
         // return value is sent to the client as JSON
     }, schema);
 }
 
-export const schema = z.object({
-    // example begin
-    name: z.string(),
-    id: z.number(),
-    // example end
-});
+myEndpoint.schema = schema;
 ```
-2. Add this to `common/api.ts` inside the `Api` type declaration:
+2. Add this to `backend/api/routes/index.ts`:
 ```ts
-    "my-endpoint": typeof import("route:my-endpoint");
+export * from "./my-endpoint";
 ```
 3. Add this to `app.ts` somewhere after the `const api` declaration:
 ```ts
 api.post("my-endpoint", myEndpoint(/* pass objects like database here */));
 ```
 
-4. Hover over `myEndpoint`, click Quick Fix and click:
-> add import from "route:my-endpoint"
+4. If you get an error at `myEndpoint`, hover over it, click "Quick Fix" and click:
+> update import from "./api/routes"
 5. Use the endpoint in frontend code:
 ```ts
 import * as typedApi from "../util/typed-api";
