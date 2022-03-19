@@ -9,7 +9,7 @@ import { Server } from "socket.io";
 import axios from "axios";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
-import type { Route, Session } from "./api/make-route";
+import type { Route } from "./api/make-route";
 import { addGroup } from "./api/routes";
 
 dotenv.config();
@@ -145,14 +145,16 @@ async function main() {
     });
 
     const api = {
-        post<Response>(path: string, route: Route<Response>) {
+        post<Request, Response>(
+            path: string,
+            { handle, schema }: Route<Request, Response>
+        ) {
             app.post(`/api/${path}`, ({ body, session }, response) => {
                 handleErrors(async () => {
-                    response.send(
-                        JSON.stringify(
-                            await route(body, (session as Session) ?? undefined)
-                        )
-                    );
+                    if (session == null) throw new Error("User not logged in");
+                    const { user } = session;
+                    const request = schema.parse(body);
+                    response.send(JSON.stringify(await handle(request, user)));
                 });
             });
         },

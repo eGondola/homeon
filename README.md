@@ -59,21 +59,20 @@
 import { z } from "zod";
 import { makePostRoute } from "../make-route";
 
-const schema = z.object({
-    // example begin
-    name: z.string(),
-    id: z.number(),
-    // example end
-});
-
 export function myEndpoint(/* pass objects like database here */) {
-    return makePostRoute(async ({ /* params from schema */ }, { login, email }) => {
-        // DO STUFF HERE
-        // return value is sent to the client as JSON
-    }, schema);
+    return makePostRoute({
+        schema: z.object({
+            // example begin
+            name: z.string(),
+            id: z.number(),
+            // example end
+        }),
+        async handle({ /* params from schema */ }, { login, email }) {
+            // DO STUFF HERE
+            // return value is sent to the client as JSON
+        },
+    });
 }
-
-myEndpoint.schema = schema;
 ```
 2. Add this to `backend/api/routes/index.ts`:
 ```ts
