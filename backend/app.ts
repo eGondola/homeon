@@ -9,8 +9,8 @@ import { Server } from "socket.io";
 import axios from "axios";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
-import type { Route } from "./api/make-route";
-import { addGroup } from "./api/routes";
+import * as routes from "./routes";
+import { addApi } from "./api";
 
 dotenv.config();
 
@@ -144,50 +144,10 @@ async function main() {
         res.send();
     });
 
-    const api = {
-        post<Request, Response>(
-            path: string,
-            { handle, schema }: Route<Request, Response>
-        ) {
-            app.post(`/api/${path}`, ({ body, session }, response) => {
-                handleErrors(async () => {
-                    if (session == null) throw new Error("User not logged in");
-                    const { user } = session;
-                    const request = schema.parse(body);
-                    response.send(JSON.stringify(await handle(request, user)));
-                });
-            });
-        },
-    };
-
-    api.post("add-group", addGroup(database));
-
-    app.post("/api/leave-group", (req, res) => {
-        handleErrors(async () => {
-            await database.users.updateOne(
-                { login: req.session?.user.login },
-                { $pull: { groups: req.body.token } }
-            );
-            const user = await database.users.findOne({
-                groups: req.body.token,
-            });
-            if (!user) {
-                await database.groups.deleteOne({ token: req.body.token });
-            }
-            res.send();
-        });
-    });
-
-    app.get("/api/groups", (req, res) => {
-        handleErrors(async () => {
-            const user = await database.users.findOne({
-                login: req.session?.user.login,
-            });
-            const groups = await database.groups
-                .find({ token: { $in: user?.groups } })
-                .toArray();
-            res.send(groups);
-        });
+    addApi(app, {
+        groups: routes.groups(database),
+        "add-group": routes.addGroup(database),
+        "leave-group": routes.leaveGroup(database),
     });
 
     app.post("/api/add-plan", (req, res) => {

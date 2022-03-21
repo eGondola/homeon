@@ -1,6 +1,9 @@
-import type { Api } from "../../common/api";
+import type { PostApi, GetApi } from "../../common/api";
 
-export async function post<T extends keyof Api>(path: T, data: Api[T]["request"]) {
+export async function post<T extends keyof PostApi>(
+    path: T,
+    data: PostApi[T]["request"]
+) {
     const response = await fetch(`/api/${path}`, {
         method: "POST",
         headers: {
@@ -8,6 +11,12 @@ export async function post<T extends keyof Api>(path: T, data: Api[T]["request"]
         },
         body: JSON.stringify(data),
     });
-    const responseData: Api[T]["response"] = await response.json();
+    const responseData: PostApi[T]["response"] = await response.json();
+    return responseData;
+}
+
+export async function get<T extends keyof GetApi>(path: T) {
+    const response = await fetch(`/api/${path}`);
+    const responseData: GetApi[T] = await response.json();
     return responseData;
 }

@@ -1,7 +1,6 @@
 <script type="ts">
     import type { Writable } from "svelte/store";
     import type { Group } from "../../common/types";
-    import * as api from "../util/api";
     import * as typedApi from "../util/typed-api";
 
     export let groupsStore: Writable<Group[]>;
@@ -46,7 +45,7 @@
                 <div
                     class="delete"
                     on:click={() => {
-                        api.post("leave-group", {
+                        typedApi.post("leave-group", {
                             token,
                         });
                         groupsStore.update((groups) => {

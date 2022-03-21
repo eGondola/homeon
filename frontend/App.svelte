@@ -2,6 +2,7 @@
     import Everything from "./Everything.svelte";
     import Authorization from "./components/Authorization.svelte";
     import * as api from "./util/api";
+    import * as typedApi from "./util/typed-api";
     import { setContext } from "svelte";
     import { writable } from "svelte/store";
 
@@ -14,7 +15,7 @@
     {#if !user.login}
         <Authorization />
     {:else}
-        {#await api.get("groups") then groups}
+        {#await typedApi.get("groups") then groups}
             <Everything {groups} />
         {/await}
     {/if}
